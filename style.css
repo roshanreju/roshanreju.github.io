@@ -134,3 +134,15 @@ footer {
 .glitch-effect {
     animation: glitch 1s linear infinite;
 }
+
+/* 3D Animation Container Styling */
+#animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+/* ... more CSS styles for the animation if needed ... */
