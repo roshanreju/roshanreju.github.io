@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg role="img" focusable="false" aria-hidden="true" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="7" cy="7" r="3" id="gradient-1" spreadMethod="reflect">
+      <stop offset="0" style="stop-color: rgba(143, 0, 0, 1)"/>
+      <stop offset="1" style="stop-color: rgba(41, 0, 0, 1)"/>
+    </radialGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="9.581" y1="1.328" x2="9.581" y2="13.328" id="gradient-0" spreadMethod="reflect">
+      <stop offset="0" style="stop-color: rgba(27, 27, 27, 1)"/>
+      <stop offset="1" style="stop-color: rgba(0, 0, 0, 1)"/>
+    </linearGradient>
+  </defs>
+  <path d="M 8.388 1.077 L 6.397 1.732 L 4 7.3 L 6.619 7.223 L 3.698 13.405 L 9.442 6.139 L 5.697 6.505 L 8.388 1.077 Z" style="fill: url(#gradient-1); paint-order: stroke; stroke: url(#gradient-0);"/>
+</svg>
