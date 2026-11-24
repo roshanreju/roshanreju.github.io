@@ -9,7 +9,7 @@ export interface FocusArea {
   title: string;
   summary: string;
   tags: string[];
-  accent: 'emerald' | 'cyan' | 'violet' | 'amber';
+  accent: 'red';
 }
 
 export interface ExperienceItem {
@@ -29,6 +29,12 @@ export interface EducationItem {
   details: string;
 }
 
+export interface VolunteeringItem {
+  role: string;
+  organization: string;
+  period?: string;
+}
+
 export interface ProjectItem {
   title: string;
   category: 'Security & AI' | 'Tools & Labs' | 'Engineering';
@@ -43,7 +49,7 @@ export interface PublicationItem {
   title: string;
   venue: string;
   date: string;
-  type: 'IEEE Paper' | 'Technical Write-up' | 'Press Feature';
+  type: 'IEEE Paper' | 'Technical Write-up';
   summary: string;
   url: string;
   badge?: string;
@@ -52,6 +58,8 @@ export interface PublicationItem {
 export interface CertificationItem {
   name: string;
   issuer: string;
+  date?: string;
+  credentialId?: string;
   url?: string;
   highlight?: string;
 }
@@ -63,37 +71,17 @@ export interface AwardItem {
   description: string;
 }
 
-export const BOX_META = {
-  hostname: 'ROSHAN-01',
-  ip: '10.10.11.24',
-  domain: 'roshanreju.github.io',
-  os: 'Linux 6.8 (Ubuntu / Chicago-DC)',
-  difficulty: 'Medium · Real-World Portfolio',
-  userFlag: 'HTB{c4ptr4_appsec_t0_r3d_t34m}',
-  rootFlag: 'HTB{r00t_4cc3ss_4i_llm_s3cur1ty_pwn3d}',
-};
-
 export const PROFILE = {
   name: 'Roshan Reju',
   handle: '@C4PTR4',
-  tagline: 'Red Teamer · AI Security · CSIRT · AppSec',
+  tagline: 'Associate Red Team Consultant @ Google · AI & LLM Security · AppSec · CSIRT',
   location: 'Chicago, IL',
-  availability: 'Red Teamer · AI Security Researcher · AppSec',
   email: 'roshan.reju@gmail.com',
-  avatarUrl: 'https://avatars.githubusercontent.com/u/48003536?v=4',
-  heroHeadline: 'Target Acquired: ROSHAN-01',
-  heroBio:
-    'AppSec Engineer turned Red Teamer & AI Security Researcher based in Chicago. Experience spanning Google, H&R Block (AppSec & 24/7 CSIRT), and Northeastern University — focused on offensive security, LLM red teaming, VAPT, and deep-learning threat detection.',
   aboutParagraphs: [
-    'I bridge offensive security and engineering—combining hands-on red teaming, manual penetration testing, DevSecOps, and 24/7 CSIRT incident investigation to uncover real-world risk before adversaries do.',
-    'My path spans Application Security and 24/7 SOC/CSIRT engineering at H&R Block, an internship opportunity at Google, and graduate cybersecurity research at Northeastern University focused on offensive security, deep-learning phishing detection, and red teaming Large Language Models (LLMs).',
-    'Recognized in the EC-Council CEH Hall of Fame (2025, plus 2021 & 2023 finalist honors), published in IEEE Xplore, and featured in The Hindu for deploying our AI phishing detection API into Kerala Police Cyberdome’s BSafe app. Outside engagements and bug bounties on HackerOne & Bugcrowd, I write under @C4PTR4, game (FPS & racing), and shoot photography.',
-  ],
-  stats: [
-    { value: 'CEH HoF', label: 'EC-Council Hall of Fame (2025)' },
-    { value: 'Google', label: 'Security Internship Alumni' },
-    { value: 'IEEE', label: 'Published AI Security Author' },
-    { value: '4×', label: 'H&R Block Security Awards' },
+    'I am an Associate Red Team Consultant at Google in Chicago, emulating real-world adversaries to test enterprise security controls, cloud environments, detection engineering, and incident response readiness.',
+    'My work incorporates Mandiant threat intelligence and real-world attacker TTPs across red team engagements, assumed breach exercises, internal/external network & web pentests, social engineering, and custom red team tool development.',
+    'Previously, I earned my M.S. in Cybersecurity from Northeastern University’s Khoury College of Computer Sciences (where I also served as a Graduate Teaching Assistant), interned as a Security Consultant at Google, and spent over two years across Application Security and 24/7 CSIRT teams at H&R Block.',
+    'I hold OffSec LLM Red Teaming, CompTIA PenTest+, and EC-Council CEH (Hall of Fame), published IEEE research on AI-based phishing detection, and volunteered as a Developer with Kerala Police Cyberdome.',
   ],
 };
 
@@ -109,162 +97,203 @@ export const SOCIALS: SocialLink[] = [
   {
     label: 'IEEE Xplore',
     href: 'https://ieeexplore.ieee.org/document/9484929',
-    handle: 'ICCIS 2021',
+    handle: 'IEEE 2021',
   },
 ];
 
 export const FOCUS_AREAS: FocusArea[] = [
   {
     id: 'red-team',
-    title: 'Red Teaming & VAPT',
+    title: 'Red Teaming & Adversary Emulation',
     summary:
-      'Adversary simulation, external OSINT reconnaissance, and manual penetration testing across web applications, APIs, Android apps, and thick clients.',
-    tags: ['Web & API Pentesting', 'OSINT', 'Android Security', 'Thick Clients'],
-    accent: 'emerald',
+      'Full-scope red team operations, assumed breach, and social engineering incorporating Mandiant threat intelligence and threat-actor TTPs.',
+    tags: ['Adversary Emulation', 'Assumed Breach', 'Mandiant TTPs', 'Social Engineering'],
+    accent: 'red',
   },
   {
     id: 'ai-security',
-    title: 'AI & LLM Security',
+    title: 'AI & LLM Red Teaming',
     summary:
-      'Red teaming Large Language Models for prompt injection, jailbreaks, and data exfiltration, plus deep-learning phishing defense.',
-    tags: ['LLM Red Teaming', 'Adversarial ML', 'AI Phishing Detection'],
-    accent: 'cyan',
+      'OffSec-certified LLM Red Teaming, adversarial AI testing, and deep-learning phishing detection research published with IEEE.',
+    tags: ['OffSec LLM Red Teaming', 'AI Security', 'Deep Learning', 'Custom Tooling'],
+    accent: 'red',
   },
   {
     id: 'appsec',
-    title: 'AppSec & DevSecOps',
+    title: 'Cloud, Network & AppSec VAPT',
     summary:
-      'Embedding security into CI/CD pipelines via SAST, dependency governance (Sonatype/SonarQube), threat modeling, and executive security metrics.',
-    tags: ['DevSecOps', 'SAST', 'SonarQube', 'Sonatype', 'PowerBI Metrics'],
-    accent: 'violet',
+      'Internal/external network, web, API, Android, and thick-client penetration testing alongside cloud IAM privilege escalation assessments.',
+    tags: ['Cloud IAM & Privesc', 'Web & API Pentest', 'Android VAPT', 'DevSecOps'],
+    accent: 'red',
   },
   {
     id: 'csirt',
-    title: 'CSIRT & Bug Bounty',
+    title: 'CSIRT, Detection & Bug Bounty',
     summary:
-      '24/7 incident triage, root-cause forensics, SIEM detection rule authoring, and responsible vulnerability disclosure on HackerOne & Bugcrowd.',
-    tags: ['Incident Response', 'Splunk', 'Detection Rules', 'HackerOne', 'Bugcrowd'],
-    accent: 'amber',
+      'Hands-on 24/7 incident response, malware analysis, SIEM detection tuning, and security research with Bugcrowd & HackerOne.',
+    tags: ['CSIRT', 'CrowdStrike Falcon', 'Malware Analysis', 'Bugcrowd'],
+    accent: 'red',
   },
 ];
 
 export const SKILL_GROUPS = [
   {
-    category: 'Offensive & Red Team',
+    category: 'Red Team & Offensive',
     items: [
-      'Red Teaming & Adversary Emulation',
-      'Penetration Testing (Web / API / Android)',
-      'LLM & AI Red Teaming',
-      'OSINT & Recon Automation',
-      'WAF Testing & Bypass',
-      'JWT & Cryptographic Attacks',
+      'Red Team Assessments',
+      'Adversary Emulation (Mandiant TTPs)',
+      'Assumed Breach & Social Engineering',
+      'LLM Red Teaming',
+      'Cloud IAM & Privilege Escalation',
+      'Internal / External Network Pentest',
+      'Web, API, Android & Thick-Client VAPT',
+      'Custom Offensive Tooling',
     ],
   },
   {
-    category: 'AppSec & CSIRT',
+    category: 'AppSec & CSIRT Defense',
     items: [
-      'DevSecOps & SAST',
-      'CSIRT / 24×7 SOC Investigation',
-      'Detection Engineering & SIEM Rules',
-      'Splunk & Imperva',
-      'Qualys & Black Kite',
-      'Bug Bounty Triage (HackerOne)',
+      'DevSecOps & SAST (SonarQube / Sonatype)',
+      'CrowdStrike Falcon & Devo',
+      'Palo Alto Networks & Netskope',
+      'Cisco ASA & Email Security',
+      'Malware Analysis & Incident Response',
+      'OSINT & Zero-Day Research',
     ],
   },
   {
-    category: 'Languages & Tooling',
+    category: 'Tools, Cloud & Code',
     items: [
       'Python',
       'Java',
       'Perl',
       'Bash',
       'Burp Suite',
-      'Nikto',
-      'SonarQube',
-      'Sonatype',
+      'Nessus & OWASP ZAP',
+      'MobSF / Drozer / ADB / JDGUI',
+      'AWS & Microsoft Azure',
+      'Splunk & Imperva',
       'PowerBI',
-      'Keras / Flask',
     ],
   },
 ];
 
 export const EXPERIENCE: ExperienceItem[] = [
   {
-    role: 'Security Intern',
+    role: 'Associate Red Team Consultant',
     organization: 'Google',
-    period: '2024',
-    location: 'United States',
+    period: 'Jun 2025 — Present',
+    location: 'Chicago, IL · Hybrid',
     highlights: [
-      'Completed security engineering / offensive security internship at Google, applying ethical hacking and application security fundamentals at scale.',
-      'Featured in EC-Council’s CEH Hall of Fame (2025) highlighting how hands-on ethical hacking foundations propelled the internship.',
+      'Conduct full-scope red team assessments, emulating real-world adversaries to evaluate client security controls, detection engineering, and incident response.',
+      'Perform internal and external penetration testing across enterprise networks and web applications.',
+      'Assess cloud environments for misconfigurations, IAM weaknesses, and privilege escalation paths.',
+      'Execute assumed breach and social engineering assessments incorporating Mandiant threat intelligence and threat-actor TTPs.',
+      'Build custom scripts, tools, and offensive methodologies to streamline red team workflows and deliver executive-ready security recommendations.',
     ],
-    tags: ['Security Engineering', 'Offensive Security', 'AppSec', 'Scale'],
+    tags: ['Red Teaming', 'Mandiant TTPs', 'Cloud Security', 'Assumed Breach', 'Tool Dev'],
   },
   {
-    role: 'Application Security Engineer',
+    role: 'Graduate Teaching Assistant',
+    organization: 'Khoury College of Computer Sciences · Northeastern University',
+    period: 'Jan 2024 — May 2025',
+    location: 'Boston, MA',
+    highlights: [
+      'Network Security Practices (CY5150) — Spring 2025 (Jan 2025 – May 2025).',
+      'Foundations of Information Assurance (CY5010) — Spring 2024 (Jan 2024 – Apr 2024).',
+      'Mentored graduate cybersecurity students through hands-on network defense, applied cryptography, and security lab assignments.',
+    ],
+    tags: ['CY5150 Network Security', 'CY5010 Info Assurance', 'Mentorship'],
+  },
+  {
+    role: 'Security Consultant Intern',
+    organization: 'Google',
+    period: 'May 2024 — Aug 2024',
+    location: 'Chicago, IL · Hybrid',
+    highlights: [
+      'Performed Web Application Pentests, API Pentests, Internal & External Red Team Assessments, and Social Engineering engagements.',
+      'Developed custom tooling to support Red Team operations.',
+    ],
+    tags: ['Red Team', 'Web & API Pentest', 'Social Engineering', 'Tool Development'],
+  },
+  {
+    role: 'Associate Security Engineer — Application Security',
     organization: 'H&R Block',
     period: 'May 2022 — Aug 2023',
-    location: 'Enterprise AppSec',
+    location: 'Trivandrum, Kerala, India',
     highlights: [
-      'Executed web application Vulnerability Assessments and Penetration Testing (VAPT) across critical enterprise applications.',
-      'Partnered with developers to shift security left via DevSecOps, SAST, and dependency management.',
-      'Collaborated with the Red Team on external OSINT assessments across public-facing infrastructure, uncovering configuration weaknesses.',
-      'Supported the HackerOne bug bounty program and built an executive PowerBI AppSec dashboard tracking pentest calendars, Sonatype T1 status, SonarQube repos, and bounty metrics.',
+      'Performed VAPT across Android, Web Applications, APIs, Thick Clients, and Web Application Firewalls (WAFs).',
+      'Implemented DevSecOps workflows with SonarQube & Sonatype SAST, dependency governance, and the Autogovernance Project.',
+      'Partnered with the Red Team on external OSINT assessments, supported the bug bounty program, and built an executive PowerBI AppSec dashboard.',
     ],
-    tags: ['VAPT', 'DevSecOps', 'SAST', 'OSINT', 'HackerOne', 'PowerBI'],
+    tags: ['Android & Web VAPT', 'DevSecOps', 'SonarQube', 'Sonatype', 'Burp Suite', 'OSINT'],
   },
   {
-    role: 'Associate Security Engineer (SOC / CSIRT)',
+    role: 'Associate Security Engineer — CSIRT',
     organization: 'H&R Block',
     period: 'Jun 2021 — May 2022',
-    location: '24/7 Security Operations Center',
+    location: 'Trivandrum, Kerala, India',
     highlights: [
-      'Investigated cybersecurity and network-level incidents in a 24/7 CSIRT / SOC environment.',
-      'Diagnosed root causes, authored detailed incident reports, and designed preventive remediation strategies.',
-      'Authored and tuned SIEM alert rules to improve detection coverage for emerging threats.',
-      'Validated 40 critical external cyber-risk findings surfaced by Black Kite, earning the H&R Block Thank You Award.',
+      'Investigated 24/7 cybersecurity and network incidents under strict SLAs, diagnosing root causes and authoring remediation reports.',
+      'Monitored cloud, endpoint, and email security telemetry using CrowdStrike Falcon, Devo, Palo Alto Networks, Netskope, Azure, and Cisco ASA.',
+      'Authored new SIEM alert rules and validated 40 critical external cyber-risk findings reported by Black Kite.',
     ],
-    tags: ['CSIRT', 'SOC 24/7', 'Incident Response', 'Detection Rules', 'Black Kite'],
+    tags: ['CSIRT', 'CrowdStrike Falcon', 'Devo', 'Palo Alto', 'Netskope', 'Malware Analysis'],
   },
   {
     role: 'Support Analyst Intern',
     organization: 'Capgemini',
     period: 'Sep 2019',
-    location: 'Banking Infrastructure',
+    location: 'Bengaluru, India',
     highlights: [
-      'Analyzed IT, storage, and network security architecture across enterprise banking infrastructure.',
-      'Studied real-time database and endpoint security monitoring using Imperva, Splunk, and Qualys.',
+      'Studied IT, network, storage, and database security architecture in the banking domain using Imperva, Splunk, and Qualys.',
     ],
-    tags: ['Network Security', 'Splunk', 'Imperva', 'Qualys'],
+    tags: ['Banking Infrastructure', 'Imperva', 'Splunk', 'Qualys'],
+  },
+  {
+    role: 'Medical IT Intern',
+    organization: 'Ministry of Health Hospital',
+    period: 'Jun 2018 — Jul 2018',
+    location: 'United Arab Emirates',
+    highlights: [
+      'Supported hospital IT operations and core network administration.',
+    ],
+    tags: ['IT Operations', 'Network Administration'],
   },
 ];
 
 export const EDUCATION: EducationItem[] = [
   {
-    degree: 'Master of Science in Cybersecurity',
-    institution: 'Northeastern University',
-    period: '2023 — 2025',
+    degree: 'Master of Science (M.S.), Cybersecurity',
+    institution: 'Khoury College of Computer Sciences · Northeastern University',
+    period: 'Sep 2023 — May 2025',
     location: 'Boston, MA',
     details:
-      'Graduate specialization in offensive security, application & network defense, deep learning for security, and red teaming Large Language Models (LLMs).',
+      'Graduate Teaching Assistant for Network Security Practices (CY5150) and Foundations of Information Assurance (CY5010). Graduate Leadership Institute recipient.',
   },
   {
-    degree: 'B.Tech in Computer Science & Engineering',
+    degree: 'Bachelor of Technology (B.Tech), Computer Science',
     institution: 'Rajagiri School of Engineering & Technology',
     period: '2017 — 2021',
     location: 'Kochi, India',
     details:
-      'Published IEEE research on AI-based phishing detection, received KSCSTE Student Project Scheme funding, and integrated our detection API into Kerala Police Cyberdome’s BSafe platform.',
+      'Published IEEE research on AI-based phishing detection, awarded KSCSTE Student Project Scheme funding, and built PHISHECTOR.',
   },
+];
+
+export const VOLUNTEERING: VolunteeringItem[] = [
+  { role: 'Developer', organization: 'Kerala Police Cyberdome', period: 'Jul 2021 — Apr 2023' },
+  { role: 'Security Researcher', organization: 'Bugcrowd' },
+  { role: 'Volunteer', organization: 'Cyber Peace Foundation' },
 ];
 
 export const PROJECTS: ProjectItem[] = [
   {
-    title: 'Phishector (Cyberdome BSafe Integration)',
+    title: 'PHISHECTOR',
     category: 'Security & AI',
     description:
-      'Deep-learning phishing detection system built alongside published IEEE research. Presented to Kerala Police Cyberdome, which integrated API components into its BSafe anti-fraud app (featured in The Hindu).',
-    stack: ['Python', 'Deep Learning', 'Phishing Defense', 'Cyberdome API'],
+      'Deep-learning phishing detection engine analyzing both HTML content and URLs. Presented to Kerala Police Cyberdome and integrated into the BSafe anti-fraud app (featured in The Hindu).',
+    stack: ['Python', 'Deep Learning', 'HTML/URL Analysis', 'Cyberdome'],
     link: 'https://www.linkedin.com/posts/roshan-reju-98702a41_security-phishing-cyberattacks-activity-6815219076705644544-mqSr/',
     linkLabel: 'View Project',
     featured: true,
@@ -273,7 +302,7 @@ export const PROJECTS: ProjectItem[] = [
     title: 'Nikto_capt.r4',
     category: 'Tools & Labs',
     description:
-      'Customized web vulnerability scanner repository based on Nikto for automated reconnaissance, dangerous file discovery, and misconfiguration auditing.',
+      'Customized web vulnerability scanner repository based on Nikto for automated web reconnaissance and misconfiguration auditing.',
     stack: ['Perl', 'Web Recon', 'Vulnerability Scanning'],
     link: 'https://github.com/roshanreju/Nikto_capt.r4',
     linkLabel: 'GitHub Repo',
@@ -283,7 +312,7 @@ export const PROJECTS: ProjectItem[] = [
     title: 'CTF & Wargame Cheatsheet',
     category: 'Tools & Labs',
     description:
-      'Curated offensive security reference covering binary exploitation, web attacks, privilege escalation, and quick command patterns for CTFs and wargames.',
+      'Personal offensive security reference covering CTF exploitation techniques, command shortcuts, and pentesting playbooks.',
     stack: ['Python', 'CTF', 'Offensive Security'],
     link: 'https://github.com/roshanreju/ctf-cheatsheet',
     linkLabel: 'GitHub Repo',
@@ -293,42 +322,41 @@ export const PROJECTS: ProjectItem[] = [
     title: 'Facial Expression Recognition (Keras + Flask)',
     category: 'Security & AI',
     description:
-      'End-to-end convolutional neural network (CNN) trained in Keras and served through a Flask web interface for live video stream and image inference.',
-    stack: ['Python', 'Keras', 'CNN', 'Flask', 'OpenCV'],
+      'Trained a convolutional neural network (CNN) in Keras and deployed it through a Flask web interface for real-time video stream and image inference.',
+    stack: ['Python', 'Keras', 'CNN', 'Flask'],
     link: 'https://github.com/roshanreju/Facial-Expression-Recognition-with-Keras',
     linkLabel: 'GitHub Repo',
   },
   {
-    title: 'TrashTalker IoT Alerting',
+    title: 'CovKart — Quarantine Made Easy',
     category: 'Engineering',
     description:
-      'IoT-enabled smart waste monitoring and real-time alerting system built in Python to automate fill-level notifications.',
-    stack: ['Python', 'IoT', 'Sensors', 'Alerting'],
-    link: 'https://github.com/roshanreju/TrashTalker',
-    linkLabel: 'GitHub Repo',
-  },
-  {
-    title: 'CovKart',
-    category: 'Engineering',
-    description:
-      'Contactless quarantine essentials platform designed during the pandemic to streamline safe local deliveries.',
-    stack: ['Web App', 'Product', 'Demo'],
+      'Built for the CracktheCovid-19 national-level hackathon (NASSCOM & IBM) — an online essentials platform making safe local shopping effortless.',
+    stack: ['Web App', 'NASSCOM × IBM Hackathon'],
     link: 'https://www.youtube.com/watch?v=L5S_8hD64Iw',
     linkLabel: 'Watch Demo',
+  },
+  {
+    title: 'Trash Talker (IoT Alerting)',
+    category: 'Engineering',
+    description:
+      'Smart waste-level monitor using Arduino Uno, HC-SR04 ultrasonic sensor, and Bolt Wi-Fi module with Python SMS alerts when thresholds are exceeded.',
+    stack: ['Python', 'Arduino', 'Bolt IoT', 'HC-SR04'],
+    link: 'https://github.com/roshanreju/TrashTalker',
+    linkLabel: 'GitHub Repo',
   },
 ];
 
 export const PUBLICATIONS: PublicationItem[] = [
   {
     title: 'Survey and Analysis on AI Based Phishing Detection Techniques',
-    venue:
-      'IEEE — International Conference on Communication, Control and Information Sciences (ICCIS)',
-    date: '2021',
+    venue: 'IEEE — ICCIS · Published Jul 20, 2021',
+    date: 'Jul 2021',
     type: 'IEEE Paper',
     summary:
-      'Co-authored comparative study evaluating machine learning and deep learning architectures for detecting phishing URLs and malicious web pages.',
+      'Evaluates three major AI-driven phishing detection paradigms — HTML content analysis, URL feature detection, and visual similarity approaches.',
     url: 'https://ieeexplore.ieee.org/document/9484929',
-    badge: '14+ Citations · IEEE Xplore',
+    badge: 'IEEE Xplore · 14+ Citations',
   },
   {
     title: 'Penetration Testing Your Web Application Firewall: A Step-by-Step Guide',
@@ -336,7 +364,7 @@ export const PUBLICATIONS: PublicationItem[] = [
     date: 'Feb 2023',
     type: 'Technical Write-up',
     summary:
-      'Practical methodology for fingerprinting, testing, and validating Web Application Firewall rulesets during offensive engagements.',
+      'Hands-on guide to fingerprinting, testing, and bypassing Web Application Firewall rulesets during offensive engagements.',
     url: 'https://medium.com/@roshan.reju/penetration-testing-your-web-application-firewall-a-step-by-step-guide-325cebb66915',
   },
   {
@@ -345,7 +373,7 @@ export const PUBLICATIONS: PublicationItem[] = [
     date: 'Hardware Security',
     type: 'Technical Write-up',
     summary:
-      'Deep-dive breakdown of hardware-level bit flips in modern DRAM modules, exploitation primitives, and mitigations.',
+      'Technical deep dive into hardware-level DRAM bit flips, exploitation primitives, and modern memory defenses.',
     url: 'https://medium.com/@roshan.reju',
   },
   {
@@ -354,69 +382,91 @@ export const PUBLICATIONS: PublicationItem[] = [
     date: 'AppSec & Crypto',
     type: 'Technical Write-up',
     summary:
-      'Hands-on exploration of JWT signing pitfalls, algorithm confusion, weak secrets, and secure token validation patterns.',
+      'Practical breakdown of JWT cryptographic misconfigurations, algorithm confusion attacks, and hardening recommendations.',
     url: 'https://medium.com/@roshan.reju',
   },
 ];
 
 export const CERTIFICATIONS: CertificationItem[] = [
   {
+    name: 'OffSec LLM Red Teaming',
+    issuer: 'OffSec',
+    date: 'Apr 2026',
+    credentialId: '180675831',
+    highlight: 'Latest · AI Red Team',
+  },
+  {
+    name: 'CompTIA PenTest+ (PT0-003)',
+    issuer: 'CompTIA',
+    date: 'Jul 2025 — Jul 2028',
+    credentialId: '683F7MD5VFQ4QDR2',
+    highlight: 'Offensive',
+  },
+  {
     name: 'Certified Ethical Hacker (CEH)',
     issuer: 'EC-Council',
+    credentialId: 'ECC49126577512',
     url: 'https://aspen.eccouncil.org/VerifyBadge?type=certification&a=MKzKWUTWF90CKqiac6WYkzx5fGkkdwc+KdC7BlTn2rk=',
     highlight: 'Verified Badge',
   },
   {
-    name: 'Microsoft Certified: Azure Fundamentals (AZ-900)',
-    issuer: 'Microsoft',
+    name: 'AWS Academy Graduate — Cloud Architecting, ML & CI/CD',
+    issuer: 'Amazon Web Services (AWS)',
+    date: 'Mar — Apr 2025',
   },
   {
-    name: 'Google IT Support Professional Certificate',
-    issuer: 'Google',
+    name: 'Microsoft Certified: Azure Fundamentals (AZ-900)',
+    issuer: 'Microsoft',
+    date: 'Aug 2022',
+  },
+  {
+    name: 'Graduate Leadership Institute & Google IT Support',
+    issuer: 'Northeastern University · Google',
+    date: '2020 — 2023',
   },
 ];
 
 export const AWARDS: AwardItem[] = [
   {
-    title: 'EC-Council CEH Hall of Fame (2025) & 2× Finalist',
+    title: 'EC-Council CEH Hall of Fame (2025) · 2023 & 2021 Finalist',
     issuer: 'EC-Council',
     date: '2021 · 2023 · 2025',
     description:
-      'Featured in EC-Council’s invitation-only CEH Hall of Fame recognizing top global ethical hacking practitioners and industry impact.',
+      'By-invitation global recognition honoring top CEH certified practitioners and offensive security impact.',
   },
   {
     title: 'Featured in The Hindu — Cyberdome BSafe Integration',
-    issuer: 'The Hindu / Kerala Police Cyberdome',
+    issuer: 'The Hindu · Kerala Police Cyberdome',
     date: 'Sep 2021',
     description:
-      'National press coverage for developing a deep-learning phishing detection API integrated into Kerala Police Cyberdome’s BSafe anti-fraud platform.',
+      'National press coverage for integrating deep-learning phishing detection into Kerala Police Cyberdome’s BSafe anti-fraud app.',
   },
   {
     title: 'Going Extra Mile Award',
     issuer: 'H&R Block',
     date: 'Jun 2023',
     description:
-      'Recognized for proactive security initiatives and high-impact contributions across the Application Security organization.',
+      'Awarded for proactive initiatives and high-impact security engineering contributions across the organization.',
   },
   {
     title: 'Quarterly Block Stars',
     issuer: 'H&R Block',
     date: 'Feb 2023',
     description:
-      'Awarded for leading external OSINT assessments with the Red Team and building the executive PowerBI AppSec visibility dashboard.',
+      'Recognized for external OSINT collaboration with the Red Team and building the executive PowerBI AppSec dashboard.',
   },
   {
     title: 'Thank You Award',
     issuer: 'H&R Block',
     date: 'Aug 2022',
     description:
-      'Recognized for validating 40 critical external cyber-risk findings reported by Black Kite.',
+      'Recognized for validating 40 critical external cyber-risk findings surfaced by Black Kite.',
   },
   {
     title: 'Beyond the Call of Duty & KSCSTE Research Funding',
     issuer: 'H&R Block · KSCSTE',
     date: 'Oct 2021',
     description:
-      'Dual recognition for Kerala Police Cyberdome association and competitive state funding under the Student Project Scheme.',
+      'Recognized for Kerala Police Cyberdome collaboration and awarded state funding under the Student Project Scheme.',
   },
 ];

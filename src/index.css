@@ -4,8 +4,8 @@
 
 @layer base {
   html {
-    background-color: #07090e;
-    color: #e2e8f0;
+    background-color: #050507;
+    color: #e4e4e7;
     scroll-behavior: smooth;
   }
 
@@ -15,46 +15,79 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #07090e;
+    background: #050507;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #1e293b;
+    background: #27272a;
     border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: #dc2626;
   }
 }
 
 @layer components {
-  .glass-card {
-    @apply rounded-2xl border border-white/[0.08] bg-surface/80 backdrop-blur-md transition-all duration-300;
+  .carbon-card {
+    @apply rounded-2xl border border-white/[0.08] bg-surface/90 backdrop-blur-md transition-all duration-300;
   }
 
-  .glass-card-hover {
-    @apply glass-card hover:border-emerald-500/30 hover:bg-elevated/80 hover:shadow-[0_0_32px_-12px_rgba(16,185,129,0.22)];
-  }
-
-  .section-kicker {
-    @apply inline-flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-[0.18em] text-emerald-400;
-  }
-
-  .section-heading {
-    @apply mt-2 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl;
+  .carbon-card-hover {
+    @apply carbon-card hover:border-red-500/40 hover:bg-elevated/90 hover:shadow-[0_0_36px_-14px_rgba(239,68,68,0.35)];
   }
 }
 
-@keyframes pulse-soft {
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes visor-scan {
+  0%, 100% {
+    transform: translateX(-18px);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(18px);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-crimson {
   0%, 100% {
     opacity: 0.45;
   }
   50% {
-    opacity: 0.85;
+    opacity: 0.9;
   }
 }
 
-.animate-pulse-soft {
-  animation: pulse-soft 6s ease-in-out infinite;
+.animate-float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 24s linear infinite;
+}
+
+.animate-visor-scan {
+  animation: visor-scan 2.6s ease-in-out infinite;
+}
+
+.animate-pulse-crimson {
+  animation: pulse-crimson 3.5s ease-in-out infinite;
 }

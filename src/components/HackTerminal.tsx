@@ -1,276 +1,219 @@
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { ChevronRight, CornerDownLeft, Play, Sparkles } from 'lucide-react';
+import { CheckCircle2, ChevronRight, CornerDownLeft, Lock, Terminal, Unlock } from 'lucide-react';
 import {
-  AUTOCOMPLETE_COMMANDS,
-  BoxState,
-  getNextMission,
+  AUTOCOMPLETE_LIST,
   getPrompt,
-  TerminalBlock,
+  HackState,
+  QUICK_ACTIONS,
+  TerminalEntry,
   TerminalLine,
 } from '../engine/boxEngine';
 
 interface HackTerminalProps {
-  boxState: BoxState;
-  blocks: TerminalBlock[];
+  state: HackState;
+  entries: TerminalEntry[];
   onRunCommand: (command: string) => void;
 }
 
 const TONE_CLASS: Record<NonNullable<TerminalLine['tone']>, string> = {
-  default: 'text-slate-300',
-  emerald: 'text-emerald-400',
-  cyan: 'text-cyan-300',
-  amber: 'text-amber-300',
-  rose: 'text-rose-400',
-  muted: 'text-slate-500',
-  white: 'text-white font-semibold',
-  flag: 'inline-block my-1 rounded-md border border-emerald-400/40 bg-emerald-500/15 px-2.5 py-1 text-emerald-200 font-semibold',
+  default: 'text-zinc-300',
+  red: 'text-red-400',
+  bright: 'text-white font-medium',
+  muted: 'text-zinc-500',
+  badge:
+    'inline-block my-1 rounded-md border border-red-500/50 bg-red-600/20 px-2.5 py-1 text-red-200 font-semibold tracking-wide',
 };
 
-const UTILITY_CHIPS = ['help', 'ls', 'whois roshan', 'flags', 'clear'];
-
-export default function HackTerminal({ boxState, blocks, onRunCommand }: HackTerminalProps) {
+export default function HackTerminal({ state, entries, onRunCommand }: HackTerminalProps) {
   const [input, setInput] = useState('');
-  const [history, setHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [cmdHistory, setCmdHistory] = useState<string[]>([]);
+  const [histIdx, setHistIdx] = useState(-1);
+  const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const prompt = getPrompt(boxState);
-  const nextMission = getNextMission(boxState);
+  const prompt = getPrompt(state);
+  const unlockedCount = Object.values(state.unlocked).filter(Boolean).length;
 
-  const autocompleteSuggestion = input.trim()
-    ? AUTOCOMPLETE_COMMANDS.find(
-        (cmd) => cmd.toLowerCase().startsWith(input.trim().toLowerCase()) && cmd !== input.trim()
+  const suggestion = input.trim()
+    ? AUTOCOMPLETE_LIST.find(
+        (c) => c.startsWith(input.trim().toLowerCase()) && c !== input.trim().toLowerCase()
       )
     : undefined;
 
   useEffect(() => {
-    const el = scrollRef.current;
-    if (el) {
-      el.scrollTop = el.scrollHeight;
+    if (logRef.current) {
+      logRef.current.scrollTop = logRef.current.scrollHeight;
     }
-  }, [blocks]);
+  }, [entries]);
 
-  const submitCommand = (raw: string) => {
+  const submit = (raw: string) => {
     const cleaned = raw.trim();
     if (!cleaned) return;
-    setHistory((prev) => [cleaned, ...prev.slice(0, 39)]);
-    setHistoryIndex(-1);
+    setCmdHistory((prev) => [cleaned, ...prev.slice(0, 29)]);
+    setHistIdx(-1);
     onRunCommand(cleaned);
     setInput('');
   };
 
-  const handleFormSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    submitCommand(input);
+    submit(input);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Tab') {
-      if (autocompleteSuggestion) {
-        e.preventDefault();
-        setInput(autocompleteSuggestion);
-      }
-      return;
-    }
-
-    if (e.key === 'ArrowUp') {
+    if (e.key === 'Tab' && suggestion) {
       e.preventDefault();
-      if (history.length === 0) return;
-      const nextIdx = Math.min(historyIndex + 1, history.length - 1);
-      setHistoryIndex(nextIdx);
-      setInput(history[nextIdx]);
+      setInput(suggestion);
       return;
     }
-
+    if (e.key === 'ArrowUp' && cmdHistory.length > 0) {
+      e.preventDefault();
+      const next = Math.min(histIdx + 1, cmdHistory.length - 1);
+      setHistIdx(next);
+      setInput(cmdHistory[next]);
+      return;
+    }
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      if (historyIndex <= 0) {
-        setHistoryIndex(-1);
+      if (histIdx <= 0) {
+        setHistIdx(-1);
         setInput('');
       } else {
-        const nextIdx = historyIndex - 1;
-        setHistoryIndex(nextIdx);
-        setInput(history[nextIdx]);
+        const next = histIdx - 1;
+        setHistIdx(next);
+        setInput(cmdHistory[next]);
       }
     }
   };
 
   return (
-    <div
-      className="flex h-[calc(100vh-8.5rem)] min-h-[540px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#090d14]/95 shadow-2xl shadow-black/60 backdrop-blur-xl"
-      onClick={() => inputRef.current?.focus()}
-    >
-      {/* Window Titlebar */}
-      <div className="flex items-center justify-between border-b border-white/[0.07] bg-white/[0.025] px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
-          <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
-          <span className="ml-2 font-mono text-[11px] text-slate-400">
-            {boxState.access === 'root'
-              ? 'root@roshan-01 (UID 0)'
-              : boxState.access === 'user'
-                ? 'ssh://guest@10.10.11.24'
-                : 'kali-attackbox — zsh'}
+    <div className="space-y-4">
+      {/* Sleek Terminal Box */}
+      <div
+        className="overflow-hidden rounded-2xl border border-red-500/25 bg-[#09090d]/95 shadow-2xl shadow-red-950/30 backdrop-blur-xl"
+        onClick={() => inputRef.current?.focus()}
+      >
+        {/* Terminal Top Bar */}
+        <div className="flex items-center justify-between border-b border-white/[0.07] bg-white/[0.02] px-4 py-2.5">
+          <div className="flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+            <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+            <span className="h-2.5 w-2.5 rounded-full bg-zinc-800" />
+            <span className="ml-2 inline-flex items-center gap-1.5 font-mono text-xs text-zinc-400">
+              <Terminal className="h-3.5 w-3.5 text-red-500" />
+              <span>{state.isRoot ? 'root@roshan-box (FULL ACCESS)' : 'roshan-box — interactive terminal'}</span>
+            </span>
+          </div>
+          <span className="font-mono text-[11px] text-red-400">
+            {unlockedCount}/4 unlocked
           </span>
         </div>
-        <span className="flex items-center gap-1.5 font-mono text-[10px] text-emerald-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          TUN0 LIVE
-        </span>
-      </div>
 
-      {/* Guided Next-Step Objective Banner */}
-      <div className="border-b border-emerald-500/20 bg-gradient-to-r from-emerald-500/[0.09] via-cyan-500/[0.05] to-transparent px-4 py-3">
-        {nextMission ? (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
-                <Sparkles className="h-3 w-3" />
-                <span>{nextMission.phase}</span>
+        {/* Output Log */}
+        <div
+          ref={logRef}
+          className="max-h-[210px] min-h-[145px] space-y-3 overflow-y-auto p-4 font-mono text-xs leading-relaxed sm:text-[13px]"
+        >
+          {entries.map((entry) => (
+            <div key={entry.id} className="space-y-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className={entry.prompt.startsWith('root@') ? 'font-semibold text-red-500' : 'font-semibold text-red-400/90'}>
+                  {entry.prompt}
+                </span>
+                <span className="text-white">{entry.command}</span>
               </div>
-              <p className="mt-0.5 text-xs text-slate-300">{nextMission.description}</p>
+              <div className="space-y-0.5 pl-2.5">
+                {entry.lines.map((line, idx) => (
+                  <div key={idx} className={TONE_CLASS[line.tone ?? 'default']}>
+                    {line.text}
+                  </div>
+                ))}
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                submitCommand(nextMission.command);
-              }}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-emerald-400/40 bg-emerald-500/20 px-3 py-1.5 font-mono text-[11px] font-semibold text-emerald-200 transition hover:bg-emerald-500/30 hover:text-white"
-            >
-              <Play className="h-3 w-3 fill-current" />
-              <span className="max-w-[200px] truncate">{nextMission.command}</span>
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between gap-2 font-mono text-xs text-emerald-300">
-            <span>🏆 ALL OBJECTIVES COMPLETE — ROOT ACCESS &amp; BOTH FLAGS CAPTURED</span>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                submitCommand('flags');
-              }}
-              className="shrink-0 rounded border border-emerald-400/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] hover:bg-emerald-500/20"
-            >
-              flags
-            </button>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
 
-      {/* Scrollable Output History */}
-      <div
-        ref={scrollRef}
-        className="flex-1 space-y-4 overflow-y-auto p-4 font-mono text-xs leading-relaxed sm:text-[12.5px]"
-      >
-        {blocks.map((block) => (
-          <div key={block.id} className="space-y-1">
-            <div className="flex flex-wrap items-center gap-1.5 break-all">
-              <span
-                className={
-                  block.prompt.startsWith('root@')
-                    ? 'font-semibold text-rose-400'
-                    : block.prompt.startsWith('guest@')
-                      ? 'font-semibold text-amber-300'
-                      : 'font-semibold text-emerald-400'
-                }
-              >
-                {block.prompt}
-              </span>
-              <span className="text-white">{block.command}</span>
-            </div>
-            <div className="space-y-0.5 pl-2">
-              {block.lines.map((line, idx) => (
-                <div
-                  key={idx}
-                  className={`whitespace-pre-wrap break-words ${
-                    TONE_CLASS[line.tone ?? 'default']
-                  }`}
-                >
-                  {line.text || '\u00A0'}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Command Input Bar */}
-      <div className="border-t border-white/[0.08] bg-black/50 px-4 py-3">
-        <form onSubmit={handleFormSubmit} className="flex items-center gap-2 font-mono text-xs">
-          <ChevronRight
-            className={`h-4 w-4 shrink-0 ${
-              boxState.access === 'root'
-                ? 'text-rose-400'
-                : boxState.access === 'user'
-                  ? 'text-amber-300'
-                  : 'text-emerald-400'
-            }`}
+        {/* Interactive Input */}
+        <form
+          onSubmit={handleSubmit}
+          className="flex items-center gap-2 border-t border-white/[0.07] bg-black/60 px-4 py-3 font-mono text-xs sm:text-[13px]"
+        >
+          <ChevronRight className="h-4 w-4 shrink-0 text-red-500" />
+          <span className="hidden shrink-0 font-semibold text-red-400 sm:inline">{prompt}</span>
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder='Type a command (try "scan", "career", "projects", "root", or "help")...'
+            autoComplete="off"
+            spellCheck={false}
+            aria-label="Interactive terminal input"
+            className="w-full bg-transparent text-white placeholder-zinc-500 focus:outline-none"
           />
-          <span
-            className={`hidden shrink-0 font-semibold sm:inline ${
-              boxState.access === 'root'
-                ? 'text-rose-400'
-                : boxState.access === 'user'
-                  ? 'text-amber-300'
-                  : 'text-emerald-400'
-            }`}
-          >
-            {prompt}
-          </span>
-          <div className="relative flex-1">
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={
-                nextMission ? `Try: ${nextMission.command}` : 'Type a command (help, ls, open github)...'
-              }
-              autoComplete="off"
-              spellCheck={false}
-              aria-label="Attacker terminal command input"
-              className="w-full bg-transparent text-white placeholder-slate-500 focus:outline-none"
-            />
-          </div>
-          {autocompleteSuggestion && (
+          {suggestion && (
             <button
               type="button"
-              onClick={() => setInput(autocompleteSuggestion)}
-              className="hidden rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-slate-400 sm:inline"
+              onClick={() => setInput(suggestion)}
+              className="hidden shrink-0 rounded border border-white/10 bg-white/[0.05] px-1.5 py-0.5 text-[10px] text-zinc-400 sm:inline"
             >
               Tab ↹
             </button>
           )}
           <button
             type="submit"
-            aria-label="Run command"
-            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-slate-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
+            aria-label="Execute command"
+            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-red-500/30 bg-red-600/15 text-red-300 transition hover:bg-red-600/30 hover:text-white"
           >
             <CornerDownLeft className="h-3.5 w-3.5" />
           </button>
         </form>
+      </div>
 
-        {/* Utility command chips */}
-        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-          {UTILITY_CHIPS.map((chip) => (
+      {/* 4 Big Friendly Mission Buttons (Great for Non-Tech & Tech Visitors!) */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {QUICK_ACTIONS.map((action) => {
+          const isUnlocked = state.unlocked[action.section];
+          const isActive = !state.showAll && state.activeSection === action.section;
+
+          return (
             <button
-              key={chip}
+              key={action.section}
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                submitCommand(chip);
-              }}
-              className="rounded border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 font-mono text-[10.5px] text-slate-400 transition hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300"
+              onClick={() => submit(action.command)}
+              className={`group flex flex-col justify-between rounded-xl border p-3.5 text-left transition-all duration-200 ${
+                isActive
+                  ? 'border-red-500 bg-red-600/15 shadow-[0_0_24px_-8px_rgba(239,68,68,0.55)]'
+                  : isUnlocked
+                    ? 'border-red-500/30 bg-surface hover:border-red-500/60 hover:bg-elevated'
+                    : 'border-white/[0.08] bg-surface/80 hover:border-red-500/40 hover:bg-elevated'
+              }`}
             >
-              {chip}
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono text-[11px] font-semibold text-red-400">
+                  STEP {action.step}
+                </span>
+                {isActive ? (
+                  <CheckCircle2 className="h-4 w-4 text-red-400" />
+                ) : isUnlocked ? (
+                  <Unlock className="h-3.5 w-3.5 text-red-400/80" />
+                ) : (
+                  <Lock className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-red-400" />
+                )}
+              </div>
+
+              <div className="mt-2.5">
+                <div className="font-display text-sm font-semibold text-white">{action.title}</div>
+                <div className="mt-0.5 text-xs text-zinc-400">{action.subtitle}</div>
+              </div>
+
+              <div className="mt-3 inline-flex w-fit items-center rounded border border-white/[0.08] bg-black/50 px-2 py-0.5 font-mono text-[10.5px] text-zinc-300 group-hover:border-red-500/40 group-hover:text-red-300">
+                $ {action.command}
+              </div>
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </div>
   );

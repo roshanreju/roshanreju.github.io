@@ -9,16 +9,16 @@ export default {
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       colors: {
-        canvas: '#07090e',
-        surface: '#0d111a',
-        elevated: '#131926',
+        canvas: '#050507',
+        surface: '#0c0c10',
+        elevated: '#14141b',
       },
       backgroundImage: {
         'grid-subtle':
-          'linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)',
+          'linear-gradient(to right, rgba(239,68,68,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(239,68,68,0.04) 1px, transparent 1px)',
       },
       backgroundSize: {
-        'grid-subtle': '48px 48px',
+        'grid-subtle': '52px 52px',
       },
     },
   },
