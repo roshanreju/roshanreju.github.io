@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background-color: #07090e;
+    color: #e2e8f0;
+    scroll-behavior: smooth;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #07090e;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-2xl border border-white/[0.08] bg-surface/80 backdrop-blur-md transition-all duration-300;
+  }
+
+  .glass-card-hover {
+    @apply glass-card hover:border-emerald-500/30 hover:bg-elevated/80 hover:shadow-[0_0_32px_-12px_rgba(16,185,129,0.22)];
+  }
+
+  .section-kicker {
+    @apply inline-flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-[0.18em] text-emerald-400;
+  }
+
+  .section-heading {
+    @apply mt-2 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl;
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 6s ease-in-out infinite;
+}
