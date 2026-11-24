@@ -1,11 +1,11 @@
-# `MARK-R4 // @C4PTR4` — 3D Red Team Storyline Portfolio
+# Roshan Reju (`@C4PTR4`) — Spatial 3D Portfolio
 
-Futuristic **Iron Man × Red Team** interactive 3D portfolio built with **React**, **TypeScript**, **Three.js (WebGL)**, **Vite**, and **Tailwind CSS**, automatically deployed to **GitHub Pages** (`https://roshanreju.github.io/`).
+Minimalist obsidian-and-crimson **3D spatial portfolio** built with **React**, **TypeScript**, **Three.js (WebGL)**, **Vite**, and **Tailwind CSS**, automatically deployed to **GitHub Pages** (`https://roshanreju.github.io/`).
 
 ## Highlights
-- **Real-Time 3D Character (`MARK-R4` Sentinel)**: Obsidian black, crimson armor, and Stark gold faceplate with mouse-tracking visor eyes, pulsing 3D Arc Reactor core, floating repulsor arms, holographic HUD rings, orbiting data nodes, and rising 3D embers.
-- **5-Chapter Cinematic Storyline**: Smooth 3D camera flights across `00 Suit Boot`, `01 The Origin`, `02 Field Missions`, `03 The Lab`, and `04 Root Vault (Overdrive)`.
-- **J.A.R.V.I.S. Interactive Console**: Type commands (`origin`, `missions`, `lab`, `overdrive`, `jarvis`, `all`, `open linkedin`, `help`) or navigate effortlessly with story chapter buttons.
+- **Interactive 3D Obsidian Gyro-Core**: Real-time Three.js spatial sculpture with exploded-view scroll choreography, precision gimbal rings, cursor parallax, and interactive pulse waves.
+- **Effortless Scroll Storyline**: Clean floating pill navigation, visionOS-inspired 3D tilt glass cards, and clear editorial pacing across Perspective, Experience, Work & Research, Credentials, and Contact.
+- **`⌘K` Hacker Command Palette**: Optional Spotlight-style shell (`whoami`, `breach`, `experience`, `work`, `credentials`, `contact`, `github`, `linkedin`, `help`) for power users.
 
 ## Quick Start
 
@@ -14,6 +14,6 @@ npm install
 npm run dev
 ```
 
-## Updating Profile Content
+## Updating Content
 
-Edit [`src/data/portfolio.ts`](src/data/portfolio.ts). Pushing to `main` triggers `.github/workflows/deploy.yml` and publishes automatically to `https://roshanreju.github.io/`.
+Edit [`src/data/portfolio.ts`](src/data/portfolio.ts). Every push to `main` automatically builds and deploys to `https://roshanreju.github.io/`.
