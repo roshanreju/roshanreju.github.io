@@ -397,7 +397,7 @@ export default function Stark3DScene({ chapter, overdrive }: Stark3DSceneProps) 
     window.addEventListener('resize', handleResize);
 
     // ── ANIMATION LOOP ──
-    const clock = new THREE.Clock();
+    const startTime = performance.now();
     const targetCamPos = new THREE.Vector3();
     const currentLookAt = new THREE.Vector3(0, 0.25, 0);
     const targetLookAt = new THREE.Vector3();
@@ -405,7 +405,7 @@ export default function Stark3DScene({ chapter, overdrive }: Stark3DSceneProps) 
 
     const animate = () => {
       frameId = window.requestAnimationFrame(animate);
-      const t = clock.getElapsedTime();
+      const t = (performance.now() - startTime) / 1000;
       const preset = CAMERA_PRESETS[chapterRef.current];
       const isOverdrive = overdriveRef.current;
       const speed = isOverdrive ? 2.6 : 1;
