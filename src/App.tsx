@@ -54,8 +54,8 @@ export default function App() {
               warping ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <div className="font-mono text-xs tracking-[0.3em] text-red-400">
-              ESTABLISHING SHELL // C4PTR4...
+            <div className="font-mono text-xs tracking-[0.25em] text-red-400">
+              connecting...
             </div>
           </div>
 
@@ -84,7 +84,7 @@ export default function App() {
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-3.5 py-1.5 text-zinc-200 backdrop-blur-md transition hover:border-red-500/50 hover:text-white"
               >
                 <LayoutGrid className="h-3.5 w-3.5 text-red-400" />
-                <span>Visual Profile</span>
+                <span>Resume View</span>
               </button>
             </div>
           </header>
@@ -92,21 +92,20 @@ export default function App() {
           {/* Editorial Intro Composition (cleanly paired with 3D figure on the right) */}
           <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 items-center px-6 py-12">
             <div className="max-w-xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-black/60 px-3.5 py-1.5 font-mono text-[11px] tracking-wider text-red-300 backdrop-blur-md">
-                <span>RED TEAM · AI SECURITY · CHICAGO</span>
-              </div>
+              <p className="font-mono text-xs tracking-wider text-zinc-400">
+                {PROFILE.location}
+              </p>
 
-              <h1 className="mt-6 font-display text-5xl font-bold leading-[1.03] tracking-tight text-white sm:text-7xl">
+              <h1 className="mt-4 font-display text-5xl font-bold leading-[1.03] tracking-tight text-white sm:text-7xl">
                 {PROFILE.name}
               </h1>
 
               <p className="mt-4 font-mono text-sm font-medium text-red-400 sm:text-base">
-                Associate Red Team Consultant @ Google
+                Red Team @ Google
               </p>
 
-              <p className="mt-4 max-w-lg text-sm leading-relaxed text-zinc-400 sm:text-base">
-                Emulating real-world adversaries across networks, cloud infrastructure, and Large
-                Language Models — finding paths in before real attackers do.
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-zinc-400 sm:text-base">
+                Breaking networks, cloud infrastructure, and AI systems before someone else does.
               </p>
 
               {/* Enter Phase 2 CTA */}
@@ -117,7 +116,7 @@ export default function App() {
                   className="group inline-flex items-center gap-2.5 rounded-full bg-red-600 px-6 py-3.5 font-mono text-xs font-semibold text-white shadow-[0_0_40px_-8px_rgba(220,38,38,0.9)] transition hover:bg-red-500 sm:text-sm"
                 >
                   <Terminal className="h-4 w-4" />
-                  <span>Enter Terminal</span>
+                  <span>Enter Shell</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </button>
 
@@ -127,20 +126,16 @@ export default function App() {
                   className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/55 px-5 py-3.5 font-mono text-xs font-medium text-zinc-200 backdrop-blur-md transition hover:border-red-500/50 hover:text-white"
                 >
                   <Bot className="h-4 w-4 text-red-400" />
-                  <span>Jailbreak My AI</span>
+                  <span>Break My AI</span>
                 </button>
               </div>
-
-              <p className="mt-6 font-mono text-[11px] text-zinc-500">
-                Press <kbd className="rounded border border-white/15 bg-white/[0.05] px-1.5 py-0.5 text-zinc-300">Enter</kbd> to launch interactive Linux shell · Real <code className="text-zinc-400">ls</code>, <code className="text-zinc-400">cd</code>, <code className="text-zinc-400">cat</code>, <code className="text-zinc-400">grep</code> &amp; <code className="text-zinc-400">sudo</code>
-              </p>
             </div>
           </main>
 
           {/* Subtle Bottom Bar */}
           <footer className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6 font-mono text-[11px] text-zinc-500">
-            <span>OffSec LLM Red Teaming · CompTIA PenTest+ · CEH Hall of Fame</span>
-            <span className="hidden sm:inline">Move cursor to track 3D figure</span>
+            <span>{PROFILE.email}</span>
+            <span>{PROFILE.handle}</span>
           </footer>
         </div>
       )}

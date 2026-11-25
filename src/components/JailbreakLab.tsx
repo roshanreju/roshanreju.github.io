@@ -322,11 +322,10 @@ export default function JailbreakLab({ open, onClose, onBreachPulse }: Jailbreak
             <div className="mt-4 rounded-2xl border border-red-500/45 bg-gradient-to-br from-red-600/20 via-black/80 to-black p-5 text-center">
               <Trophy className="mx-auto h-7 w-7 text-red-400" />
               <h3 className="mt-2 font-display text-xl font-bold text-white">
-                Guardrails Compromised.
+                Guardrails down.
               </h3>
-              <p className="mt-1 font-sans text-xs text-zinc-300">
-                You just walked through 3 real LLM red-teaming techniques: instruction override,
-                contextual reframing, and encoded exfiltration.
+              <p className="mt-1 font-sans text-xs text-zinc-400">
+                Clean bypass across all three layers.
               </p>
               <div className="mx-auto mt-4 flex max-w-md items-center justify-between gap-2 rounded-xl border border-red-500/40 bg-black/80 px-3.5 py-2.5 text-xs text-red-300">
                 <span className="truncate">{FLAG}</span>

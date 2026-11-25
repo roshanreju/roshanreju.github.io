@@ -280,8 +280,8 @@ export default function TerminalWorkspace({
             className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-xs text-zinc-200 transition hover:border-white/25 hover:text-white"
           >
             <LayoutGrid className="h-3.5 w-3.5 text-zinc-400" />
-            <span className="hidden sm:inline">Visual Profile</span>
-            <span className="sm:hidden">Visual</span>
+            <span className="hidden sm:inline">Resume View</span>
+            <span className="sm:hidden">Resume</span>
           </button>
         </div>
       </header>
@@ -358,13 +358,6 @@ export default function TerminalWorkspace({
                   <span className="truncate">/root/flag.txt</span>
                 </button>
               )}
-            </div>
-
-            <div className="mt-6 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3 font-mono text-[11px] leading-relaxed text-zinc-500">
-              <div className="font-semibold text-zinc-300">Tips</div>
-              <p className="mt-1">• Click any file to run <code className="text-red-400">cat</code></p>
-              <p>• Press <code className="text-zinc-300">Tab</code> to autocomplete paths</p>
-              <p>• Try <code className="text-red-400">ls -la</code> for hidden files</p>
             </div>
           </aside>
         )}
