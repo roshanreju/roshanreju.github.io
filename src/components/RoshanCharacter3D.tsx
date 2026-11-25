@@ -366,60 +366,61 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     headMesh.castShadow = true;
     headGroup.add(headMesh);
 
-    // ── CLEAN 3D GROOMED BEARD (Low cheek line, bare skin around mouth, tidy chin & mustache) ──
+    // ── CLEAN 3D GROOMED BEARD (Single seamless contoured jaw mesh, zero sticking-out patches) ──
     const beardGroup = new THREE.Group();
     headGroup.add(beardGroup);
 
-    // Sleek lower-jaw & chin beard shell sitting cleanly below the cheeks and mouth
     const beardGeo = new THREE.SphereGeometry(
-      0.548,
-      36,
-      24,
+      0.546,
+      40,
+      28,
       0,
       Math.PI * 2,
-      Math.PI * 0.68,
-      Math.PI * 0.32
+      Math.PI * 0.61,
+      Math.PI * 0.39
     );
     const bPos = beardGeo.attributes.position as THREE.BufferAttribute;
     for (let i = 0; i < bPos.count; i++) {
       let x = bPos.getX(i);
       let y = bPos.getY(i);
       let z = bPos.getZ(i);
+
+      // Match exact headMesh proportions + tiny 1% outward offset so it hugs tightly
       y *= 1.125;
       x *= 0.94;
-      z *= 0.985;
+      z *= 0.98;
       if (y < 0) {
-        const taper = 1 - Math.abs(y) * 0.23;
+        const taper = 1 - Math.abs(y) * 0.24;
         x *= taper;
-        z *= 1 - Math.abs(y) * 0.09;
+        z *= 1 - Math.abs(y) * 0.1;
       }
-      // Dip subtly in the front center so bare skin flanks the mouth/soul-patch cleanly
-      if (z > 0.15 && Math.abs(x) < 0.26 && y > -0.42) {
-        y -= 0.035 * (1 - Math.abs(x) / 0.26);
+
+      // Smoothly contour the upper rim: dip cleanly below mouth in front, taper smoothly up near sideburns
+      if (y > -0.34) {
+        const rimFactor = Math.max(0, Math.min(1, (y + 0.34) / 0.18));
+        const ax = Math.abs(x);
+        if (z > 0.18 && ax < 0.26) {
+          // Keep mouth & lip corners cleanly uncovered
+          y -= 0.085 * rimFactor * (1 - ax / 0.26);
+        } else if (z > -0.05 && ax > 0.28) {
+          // Smoothly slope up toward sideburns right in front of the ears
+          y += 0.14 * rimFactor * Math.min(1, (ax - 0.28) / 0.18);
+        }
       }
-      // Trim back cleanly under jawline so it doesn't wrap behind the neck
-      if (z < -0.1) {
-        z = -0.1 + (z + 0.1) * 0.22;
+
+      // Tuck cleanly inside the head behind the jawline/ears so zero hair pokes out back or below ears
+      if (z < -0.06) {
+        const backFade = Math.min(1, (-0.06 - z) / 0.18);
+        const shrink = 1 - backFade * 0.12;
+        x *= shrink;
+        z *= shrink;
       }
+
       bPos.setXYZ(i, x, y, z);
     }
     beardGeo.computeVertexNormals();
     const beardJaw = new THREE.Mesh(beardGeo, beardMat);
     beardGroup.add(beardJaw);
-
-    // Tapered sideburn-to-jaw connectors hugging the sides neatly
-    for (const side of [-1, 1]) {
-      const jawStrip = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.28, 10, 14), beardMat);
-      jawStrip.position.set(side * 0.41, -0.15, 0.15);
-      jawStrip.rotation.z = side * 0.32;
-      jawStrip.rotation.x = 0.26;
-      beardGroup.add(jawStrip);
-
-      const sideburn = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.18, 10, 12), beardMat);
-      sideburn.position.set(side * 0.45, 0.04, 0.06);
-      sideburn.rotation.z = side * -0.06;
-      beardGroup.add(sideburn);
-    }
 
     // Clean curved mustache framing the upper lip
     for (const side of [-1, 1]) {
@@ -430,15 +431,15 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       beardGroup.add(stache);
     }
 
-    // Subtle warm lip line & small neat rounded soul patch
+    // Subtle warm lip line & neat small rounded soul patch
     const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.02, 0.13, 8, 12), lipMat);
     mouth.rotation.z = Math.PI / 2;
     mouth.position.set(0, -0.262, 0.48);
     headGroup.add(mouth);
 
-    const soulPatch = new THREE.Mesh(new THREE.SphereGeometry(0.038, 12, 12), beardMat);
-    soulPatch.scale.set(0.9, 1.35, 0.55);
-    soulPatch.position.set(0, -0.335, 0.466);
+    const soulPatch = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 12), beardMat);
+    soulPatch.scale.set(0.88, 1.3, 0.48);
+    soulPatch.position.set(0, -0.335, 0.464);
     beardGroup.add(soulPatch);
 
     // Ears
