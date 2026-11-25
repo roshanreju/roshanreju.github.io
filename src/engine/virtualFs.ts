@@ -507,7 +507,7 @@ function executeSingle(trimmed: string, state: ShellState): ShellExecutionResult
         { text: '  base64 -d <file|str> Decode Base64 data (hint: ls -la)', tone: 'default' },
         { text: '  sudo -l              Inspect sudo privileges', tone: 'default' },
         { text: '  open <github|linkedin|twitter|medium|ieee>', tone: 'default' },
-        { text: '  visual / stage       Switch to Visual Profile or 3D Opening Stage', tone: 'default' },
+        { text: '  resume / home        Switch to Resume view or Home', tone: 'default' },
         { text: '  whoami · id · uname -a · history · clear', tone: 'muted' },
       ],
     };
@@ -897,10 +897,10 @@ function executeSingle(trimmed: string, state: ShellState): ShellExecutionResult
     };
   }
 
-  if (cmd === 'stage' || cmd === 'exit' || cmd === '3d') {
+  if (cmd === 'home' || cmd === 'stage' || cmd === 'exit') {
     return {
       nextState: state,
-      lines: [{ text: '[+] Returning to 3D Opening Stage...', tone: 'muted' }],
+      lines: [{ text: '[+] Returning home...', tone: 'muted' }],
       switchMode: 'stage',
     };
   }

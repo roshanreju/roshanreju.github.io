@@ -74,7 +74,7 @@ export default function VisualProfile({
               className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 font-mono text-xs text-zinc-300 transition hover:border-red-500/40 hover:text-white"
             >
               <ArrowLeft className="h-3.5 w-3.5 text-red-400" />
-              <span>3D Stage</span>
+              <span>Home</span>
             </button>
             <span className="font-mono text-xs font-bold text-white">{PROFILE.handle}</span>
           </div>

@@ -228,7 +228,7 @@ export default function TerminalWorkspace({
             className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 font-mono text-xs text-zinc-300 transition hover:border-red-500/40 hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5 text-red-400" />
-            <span className="hidden sm:inline">3D Stage</span>
+            <span className="hidden sm:inline">Home</span>
           </button>
 
           <button
