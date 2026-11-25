@@ -15,7 +15,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import CommandPalette from './components/CommandPalette';
-import SecretVoid from './components/SecretVoid';
+import JailbreakLab from './components/JailbreakLab';
 import SpatialCore3D from './components/SpatialCore3D';
 import TiltCard from './components/TiltCard';
 import {
@@ -34,11 +34,11 @@ import {
 } from './data/portfolio';
 
 const NAV_ITEMS = [
-  { id: 'about', label: 'whoami/' },
-  { id: 'experience', label: 'xp/' },
-  { id: 'work', label: 'work/' },
-  { id: 'credentials', label: 'certs/' },
-  { id: 'contact', label: 'comms/' },
+  { id: 'about', label: 'Profile' },
+  { id: 'experience', label: 'Ops' },
+  { id: 'work', label: 'Arsenal' },
+  { id: 'credentials', label: 'Certs' },
+  { id: 'contact', label: 'Signal' },
 ];
 
 const FOCUS_ICONS = {
@@ -55,7 +55,7 @@ export default function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('top');
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [voidOpen, setVoidOpen] = useState(false);
+  const [labOpen, setLabOpen] = useState(false);
   const [pulseTrigger, setPulseTrigger] = useState(0);
   const [filter, setFilter] = useState<ProjectFilter>('All');
   const [copied, setCopied] = useState(false);
@@ -200,21 +200,21 @@ export default function App() {
             })}
             <button
               type="button"
-              onClick={() => setVoidOpen(true)}
-              title="Enter the void..."
+              onClick={() => setLabOpen(true)}
+              title="Try breaking my 3-layer LLM guardrail"
               className="rounded-full px-3 py-1.5 font-mono text-xs font-semibold text-red-400 transition hover:bg-red-600/15 hover:text-red-200"
             >
-              ???
+              Jailbreak
             </button>
           </div>
 
           <button
             type="button"
-            onClick={() => setVoidOpen(true)}
-            title="Enter the void..."
+            onClick={() => setLabOpen(true)}
+            title="Try breaking my 3-layer LLM guardrail"
             className="rounded-full px-2.5 py-1.5 font-mono text-xs font-semibold text-red-400 transition hover:bg-red-600/15 hover:text-red-200 md:hidden"
           >
-            ???
+            Jailbreak
           </button>
 
           <button
@@ -271,20 +271,20 @@ export default function App() {
 
             <button
               type="button"
+              onClick={() => setLabOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-red-500/40 bg-red-600/15 px-5 py-3 text-sm font-medium text-red-200 backdrop-blur-md transition hover:border-red-400 hover:bg-red-600/25 hover:text-white"
+            >
+              <Bot className="h-4 w-4 text-red-400" />
+              <span>Jailbreak My AI</span>
+            </button>
+
+            <button
+              type="button"
               onClick={triggerCorePulse}
               className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/50 px-5 py-3 text-sm font-medium text-zinc-200 backdrop-blur-md transition hover:border-red-500/50 hover:text-white"
             >
               <Sparkles className="h-4 w-4 text-red-400" />
               <span>Pulse 3D Core</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setPaletteOpen(true)}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-5 py-3 font-mono text-xs text-zinc-300 backdrop-blur-md transition hover:border-red-500/40 hover:text-white"
-            >
-              <Terminal className="h-3.5 w-3.5 text-red-400" />
-              <span>Open Shell</span>
             </button>
           </div>
 
@@ -721,15 +721,14 @@ export default function App() {
             © {new Date().getFullYear()} {PROFILE.name} ({PROFILE.handle})
           </p>
           <p>
-            Press ⌘K for shell · Click{' '}
+            Press ⌘K for shell · Try to{' '}
             <button
               type="button"
-              onClick={() => setVoidOpen(true)}
+              onClick={() => setLabOpen(true)}
               className="text-red-400 hover:underline"
             >
-              ???
-            </button>{' '}
-            if you&apos;re curious
+              jailbreak the AI guardrail
+            </button>
           </p>
         </div>
       </footer>
@@ -740,11 +739,15 @@ export default function App() {
         onClose={() => setPaletteOpen(false)}
         onNavigate={navigateTo}
         onPulseCore={triggerCorePulse}
-        onOpenVoid={() => setVoidOpen(true)}
+        onOpenLab={() => setLabOpen(true)}
       />
 
-      {/* Hidden ??? Crimson Matrix + Playable Mini-Game */}
-      <SecretVoid open={voidOpen} onClose={() => setVoidOpen(false)} />
+      {/* Original 3-Layer LLM Red-Teaming Sandbox */}
+      <JailbreakLab
+        open={labOpen}
+        onClose={() => setLabOpen(false)}
+        onBreachPulse={triggerCorePulse}
+      />
     </div>
   );
 }

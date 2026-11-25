@@ -7,7 +7,7 @@ interface CommandPaletteProps {
   onClose: () => void;
   onNavigate: (sectionId: string) => void;
   onPulseCore: () => void;
-  onOpenVoid: () => void;
+  onOpenLab: () => void;
 }
 
 interface LogItem {
@@ -17,12 +17,12 @@ interface LogItem {
 }
 
 const QUICK_CMDS = [
-  { label: 'whoami', hint: 'Profile summary' },
+  { label: 'jailbreak', hint: 'Play LLM Red-Team Lab' },
   { label: 'breach', hint: 'Pulse 3D core' },
-  { label: '???', hint: 'Enter the void' },
-  { label: 'xp', hint: 'Jump to career' },
-  { label: 'work', hint: 'Projects & IEEE' },
-  { label: 'contact', hint: 'Direct email & links' },
+  { label: 'ops', hint: 'Career & Google Red Team' },
+  { label: 'arsenal', hint: 'Projects & IEEE paper' },
+  { label: 'certs', hint: 'OffSec, PenTest+, CEH' },
+  { label: 'signal', hint: 'Direct email & links' },
 ];
 
 export default function CommandPalette({
@@ -30,7 +30,7 @@ export default function CommandPalette({
   onClose,
   onNavigate,
   onPulseCore,
-  onOpenVoid,
+  onOpenLab,
 }: CommandPaletteProps) {
   const [input, setInput] = useState('');
   const [logs, setLogs] = useState<LogItem[]>([
@@ -86,19 +86,18 @@ export default function CommandPalette({
 
     if (cmd === 'help' || cmd === '?') {
       out = [
-        'whoami / nmap       Inspect operator profile & focus',
+        'jailbreak / llm     Launch 3-layer LLM Red-Team Sandbox',
         'breach / pulse      Trigger 3D obsidian core explosion wave',
-        '??? / void / game   Enter the hidden Crimson Void mini-game',
-        'about · xp · work · certs · contact',
+        'profile · ops · arsenal · certs · signal',
         'github · linkedin · twitter · medium · ieee · email · clear',
       ];
-    } else if (cmd === '???' || cmd === 'void' || cmd === 'game') {
-      out = ['[+] Opening 0xC4PTR4 // THE VOID...'];
+    } else if (cmd === 'jailbreak' || cmd === 'llm' || cmd === 'sandbox' || cmd === 'lab') {
+      out = ['[+] Launching LLM Red-Team Sandbox...'];
       window.setTimeout(() => {
         onClose();
-        onOpenVoid();
+        onOpenLab();
       }, 220);
-    } else if (cmd === 'whoami' || cmd === 'nmap') {
+    } else if (cmd === 'profile' || cmd === 'whoami' || cmd === 'nmap') {
       onPulseCore();
       out = [
         `${PROFILE.name} (${PROFILE.handle}) — ${PROFILE.location}`,
@@ -111,15 +110,19 @@ export default function CommandPalette({
         '[+] Kinetic core unlocked — spatial telemetry surged.',
         'All portfolio sections are open for inspection.',
       ];
-    } else if (['about', 'experience', 'xp', 'career', 'work', 'projects', 'credentials', 'certs', 'contact'].includes(cmd)) {
+    } else if (
+      ['about', 'ops', 'experience', 'career', 'arsenal', 'work', 'projects', 'credentials', 'certs', 'signal', 'contact'].includes(cmd)
+    ) {
       const target =
-        cmd === 'career' || cmd === 'xp'
+        cmd === 'ops' || cmd === 'career'
           ? 'experience'
-          : cmd === 'projects'
+          : cmd === 'arsenal' || cmd === 'projects'
             ? 'work'
             : cmd === 'certs'
               ? 'credentials'
-              : cmd;
+              : cmd === 'signal'
+                ? 'contact'
+                : cmd;
       onPulseCore();
       onNavigate(target);
       out = [`[+] Navigated to #${target}.`];
