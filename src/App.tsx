@@ -15,6 +15,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import CommandPalette from './components/CommandPalette';
+import SecretVoid from './components/SecretVoid';
 import SpatialCore3D from './components/SpatialCore3D';
 import TiltCard from './components/TiltCard';
 import {
@@ -33,11 +34,11 @@ import {
 } from './data/portfolio';
 
 const NAV_ITEMS = [
-  { id: 'about', label: 'About' },
-  { id: 'experience', label: 'Experience' },
-  { id: 'work', label: 'Work' },
-  { id: 'credentials', label: 'Credentials' },
-  { id: 'contact', label: 'Contact' },
+  { id: 'about', label: 'whoami/' },
+  { id: 'experience', label: 'xp/' },
+  { id: 'work', label: 'work/' },
+  { id: 'credentials', label: 'certs/' },
+  { id: 'contact', label: 'comms/' },
 ];
 
 const FOCUS_ICONS = {
@@ -54,6 +55,7 @@ export default function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('top');
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [voidOpen, setVoidOpen] = useState(false);
   const [pulseTrigger, setPulseTrigger] = useState(0);
   const [filter, setFilter] = useState<ProjectFilter>('All');
   const [copied, setCopied] = useState(false);
@@ -172,10 +174,10 @@ export default function App() {
               e.preventDefault();
               navigateTo('top');
             }}
-            className="flex items-center gap-2 rounded-full px-3.5 py-1.5 font-display text-xs font-semibold tracking-tight text-white transition hover:text-red-300 sm:text-sm"
+            className="flex items-center gap-2 rounded-full px-3.5 py-1.5 font-mono text-xs font-bold tracking-tight text-white transition hover:text-red-300 sm:text-sm"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-            <span>Roshan Reju</span>
+            <span>C4PTR4</span>
           </a>
 
           <div className="hidden items-center gap-0.5 md:flex">
@@ -186,7 +188,7 @@ export default function App() {
                   key={item.id}
                   type="button"
                   onClick={() => navigateTo(item.id)}
-                  className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
+                  className={`rounded-full px-3 py-1.5 font-mono text-xs transition ${
                     active
                       ? 'bg-white/[0.1] text-white'
                       : 'text-zinc-400 hover:bg-white/[0.05] hover:text-white'
@@ -196,7 +198,24 @@ export default function App() {
                 </button>
               );
             })}
+            <button
+              type="button"
+              onClick={() => setVoidOpen(true)}
+              title="Enter the void..."
+              className="rounded-full px-3 py-1.5 font-mono text-xs font-semibold text-red-400 transition hover:bg-red-600/15 hover:text-red-200"
+            >
+              ???
+            </button>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setVoidOpen(true)}
+            title="Enter the void..."
+            className="rounded-full px-2.5 py-1.5 font-mono text-xs font-semibold text-red-400 transition hover:bg-red-600/15 hover:text-red-200 md:hidden"
+          >
+            ???
+          </button>
 
           <button
             type="button"
@@ -701,7 +720,17 @@ export default function App() {
           <p>
             © {new Date().getFullYear()} {PROFILE.name} ({PROFILE.handle})
           </p>
-          <p>Press ⌘K to open the command shell</p>
+          <p>
+            Press ⌘K for shell · Click{' '}
+            <button
+              type="button"
+              onClick={() => setVoidOpen(true)}
+              className="text-red-400 hover:underline"
+            >
+              ???
+            </button>{' '}
+            if you&apos;re curious
+          </p>
         </div>
       </footer>
 
@@ -711,7 +740,11 @@ export default function App() {
         onClose={() => setPaletteOpen(false)}
         onNavigate={navigateTo}
         onPulseCore={triggerCorePulse}
+        onOpenVoid={() => setVoidOpen(true)}
       />
+
+      {/* Hidden ??? Crimson Matrix + Playable Mini-Game */}
+      <SecretVoid open={voidOpen} onClose={() => setVoidOpen(false)} />
     </div>
   );
 }

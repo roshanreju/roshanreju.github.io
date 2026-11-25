@@ -7,6 +7,7 @@ interface CommandPaletteProps {
   onClose: () => void;
   onNavigate: (sectionId: string) => void;
   onPulseCore: () => void;
+  onOpenVoid: () => void;
 }
 
 interface LogItem {
@@ -17,10 +18,10 @@ interface LogItem {
 
 const QUICK_CMDS = [
   { label: 'whoami', hint: 'Profile summary' },
-  { label: 'breach', hint: 'Trigger 3D core surge' },
-  { label: 'experience', hint: 'Jump to career' },
-  { label: 'work', hint: 'Jump to projects & IEEE' },
-  { label: 'credentials', hint: 'Certs & honors' },
+  { label: 'breach', hint: 'Pulse 3D core' },
+  { label: '???', hint: 'Enter the void' },
+  { label: 'xp', hint: 'Jump to career' },
+  { label: 'work', hint: 'Projects & IEEE' },
   { label: 'contact', hint: 'Direct email & links' },
 ];
 
@@ -29,6 +30,7 @@ export default function CommandPalette({
   onClose,
   onNavigate,
   onPulseCore,
+  onOpenVoid,
 }: CommandPaletteProps) {
   const [input, setInput] = useState('');
   const [logs, setLogs] = useState<LogItem[]>([
@@ -86,9 +88,16 @@ export default function CommandPalette({
       out = [
         'whoami / nmap       Inspect operator profile & focus',
         'breach / pulse      Trigger 3D obsidian core explosion wave',
-        'about · experience · work · credentials · contact',
+        '??? / void / game   Enter the hidden Crimson Void mini-game',
+        'about · xp · work · certs · contact',
         'github · linkedin · twitter · medium · ieee · email · clear',
       ];
+    } else if (cmd === '???' || cmd === 'void' || cmd === 'game') {
+      out = ['[+] Opening 0xC4PTR4 // THE VOID...'];
+      window.setTimeout(() => {
+        onClose();
+        onOpenVoid();
+      }, 220);
     } else if (cmd === 'whoami' || cmd === 'nmap') {
       onPulseCore();
       out = [
@@ -102,9 +111,9 @@ export default function CommandPalette({
         '[+] Kinetic core unlocked — spatial telemetry surged.',
         'All portfolio sections are open for inspection.',
       ];
-    } else if (['about', 'experience', 'career', 'work', 'projects', 'credentials', 'certs', 'contact'].includes(cmd)) {
+    } else if (['about', 'experience', 'xp', 'career', 'work', 'projects', 'credentials', 'certs', 'contact'].includes(cmd)) {
       const target =
-        cmd === 'career'
+        cmd === 'career' || cmd === 'xp'
           ? 'experience'
           : cmd === 'projects'
             ? 'work'
