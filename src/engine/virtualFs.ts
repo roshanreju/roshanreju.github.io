@@ -199,7 +199,6 @@ function buildFileSystem(): FsDir {
                   '  cat about.md',
                   '  tree',
                   '  grep -i google -r .',
-                  '  jailbreak',
                 ].join('\n'),
               },
               'about.md': { type: 'file', content: aboutContent },
@@ -239,7 +238,7 @@ function buildFileSystem(): FsDir {
           },
           motd: {
             type: 'file',
-            content: 'Unauthorized access is... actually encouraged here. Try "sudo -l" or "jailbreak".',
+            content: 'try "sudo -l" or "ls -la".',
           },
         },
       },
@@ -254,7 +253,7 @@ function buildFileSystem(): FsDir {
             content: [
               `FLAG: ${ROOT_FLAG}`,
               '',
-              'root acquired. try "jailbreak" next.',
+              'root acquired.',
             ].join('\n'),
           },
         },
@@ -363,7 +362,6 @@ const KNOWN_COMMANDS = [
   'base64',
   'nmap',
   'sudo',
-  'jailbreak',
   'open',
   'visual',
   'stage',
@@ -447,7 +445,6 @@ export interface ShellExecutionResult {
   lines: ShellLine[];
   clear?: boolean;
   openUrl?: string;
-  openJailbreak?: boolean;
   switchMode?: 'visual' | 'stage';
 }
 
@@ -470,7 +467,7 @@ export function executeShellCommand(rawInput: string, state: ShellState): ShellE
       const res = executeSingle(seg, curState);
       curState = res.nextState;
       allLines.push(...res.lines);
-      if (res.openUrl || res.openJailbreak || res.switchMode) {
+      if (res.openUrl || res.switchMode) {
         return { ...res, nextState: curState, lines: allLines };
       }
     }
@@ -509,7 +506,6 @@ function executeSingle(trimmed: string, state: ShellState): ShellExecutionResult
         { text: '  nmap                 Scan local box services', tone: 'default' },
         { text: '  base64 -d <file|str> Decode Base64 data (hint: ls -la)', tone: 'default' },
         { text: '  sudo -l              Inspect sudo privileges', tone: 'default' },
-        { text: '  jailbreak            Launch 3-layer LLM Red-Team Sandbox', tone: 'default' },
         { text: '  open <github|linkedin|twitter|medium|ieee>', tone: 'default' },
         { text: '  visual / stage       Switch to Visual Profile or 3D Opening Stage', tone: 'default' },
         { text: '  whoami · id · uname -a · history · clear', tone: 'muted' },
@@ -855,8 +851,7 @@ function executeSingle(trimmed: string, state: ShellState): ShellExecutionResult
         { text: 'PORT     STATE  SERVICE', tone: 'red' },
         { text: '22/tcp   open   ssh        OpenSSH 9.8 (visitor shell active)', tone: 'default' },
         { text: '443/tcp  open   https      roshanreju.github.io', tone: 'default' },
-        { text: '8080/tcp open   llm-guard  3-Layer LLM Red-Team Sandbox (run: jailbreak)', tone: 'white' },
-        { text: '9001/tcp open   sudoers    Local privesc vector? (check: sudo -l)', tone: 'muted' },
+        { text: '9001/tcp open   sudoers    local privesc? (sudo -l)', tone: 'muted' },
       ],
     };
   }
@@ -894,15 +889,7 @@ function executeSingle(trimmed: string, state: ShellState): ShellExecutionResult
     };
   }
 
-  if (cmd === 'jailbreak' || cmd === 'llm') {
-    return {
-      nextState: state,
-      lines: [{ text: '[+] Launching 3-Layer LLM Red-Team Sandbox...', tone: 'red' }],
-      openJailbreak: true,
-    };
-  }
-
-  if (cmd === 'visual' || cmd === 'gui' || cmd === 'profile') {
+  if (cmd === 'visual' || cmd === 'gui' || cmd === 'profile' || cmd === 'resume') {
     return {
       nextState: state,
       lines: [{ text: '[+] Switching to Visual Profile View...', tone: 'red' }],

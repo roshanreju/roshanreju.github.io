@@ -1,7 +1,6 @@
 import { FormEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
-  Bot,
   ChevronRight,
   FileText,
   Folder,
@@ -28,7 +27,6 @@ import {
 interface TerminalWorkspaceProps {
   onBackToStage: () => void;
   onSwitchVisual: () => void;
-  onOpenJailbreak: () => void;
 }
 
 const LINE_STYLE: Record<NonNullable<ShellLine['tone']>, string> = {
@@ -67,12 +65,11 @@ function renderWithLinks(text: string): ReactNode {
   );
 }
 
-const QUICK_COMMANDS = ['ls -la', 'tree', 'cat about.md', 'nmap', 'sudo -l', 'jailbreak', 'help'];
+const QUICK_COMMANDS = ['ls -la', 'tree', 'cat about.md', 'nmap', 'sudo -l', 'help'];
 
 export default function TerminalWorkspace({
   onBackToStage,
   onSwitchVisual,
-  onOpenJailbreak,
 }: TerminalWorkspaceProps) {
   const [shellState, setShellState] = useState<ShellState>(() => ({
     ...INITIAL_SHELL_STATE,
@@ -123,9 +120,6 @@ export default function TerminalWorkspace({
 
     if (res.openUrl) {
       window.open(res.openUrl, '_blank', 'noopener,noreferrer');
-    }
-    if (res.openJailbreak) {
-      onOpenJailbreak();
     }
     if (res.switchMode === 'visual') {
       onSwitchVisual();
@@ -264,16 +258,6 @@ export default function TerminalWorkspace({
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onOpenJailbreak}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/35 bg-red-600/15 px-3 py-1.5 font-mono text-xs font-medium text-red-200 transition hover:border-red-400 hover:bg-red-600/25 hover:text-white"
-          >
-            <Bot className="h-3.5 w-3.5 text-red-400" />
-            <span className="hidden sm:inline">LLM Jailbreak</span>
-            <span className="sm:hidden">AI Lab</span>
-          </button>
-
           <button
             type="button"
             onClick={onSwitchVisual}

@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   ArrowUpRight,
   BadgeCheck,
-  Bot,
   Check,
   Copy,
   ExternalLink,
@@ -28,7 +27,6 @@ import {
 interface VisualProfileProps {
   onBackToStage: () => void;
   onSwitchTerminal: () => void;
-  onOpenJailbreak: () => void;
 }
 
 type ProjectFilter = 'All' | ProjectItem['category'];
@@ -37,7 +35,6 @@ const FILTERS: ProjectFilter[] = ['All', 'Security & AI', 'Tools & Labs', 'Engin
 export default function VisualProfile({
   onBackToStage,
   onSwitchTerminal,
-  onOpenJailbreak,
 }: VisualProfileProps) {
   const [filter, setFilter] = useState<ProjectFilter>('All');
   const [copied, setCopied] = useState(false);
@@ -85,20 +82,11 @@ export default function VisualProfile({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={onOpenJailbreak}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/35 bg-red-600/15 px-3 py-1.5 font-mono text-xs text-red-200 transition hover:bg-red-600/25 hover:text-white"
-            >
-              <Bot className="h-3.5 w-3.5 text-red-400" />
-              <span className="hidden sm:inline">LLM Jailbreak</span>
-            </button>
-
-            <button
-              type="button"
               onClick={onSwitchTerminal}
               className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 font-mono text-xs font-semibold text-white transition hover:bg-red-500"
             >
               <Terminal className="h-3.5 w-3.5" />
-              <span>Open Terminal</span>
+              <span>Open Shell</span>
             </button>
           </div>
         </div>
