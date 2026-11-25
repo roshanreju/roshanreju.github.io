@@ -63,7 +63,7 @@ export default function VisualProfile({
   };
 
   return (
-    <div className="min-h-screen bg-[#050507] text-zinc-200">
+    <div className="min-h-[100dvh] overflow-x-hidden bg-[#050507] text-zinc-200">
       {/* Top Bar */}
       <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#050507]/85 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
