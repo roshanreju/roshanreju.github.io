@@ -123,7 +123,7 @@ export default function App() {
             >
               {PROFILE.email}
             </a>
-            <span>drag to rotate</span>
+            <span>{PROFILE.handle}</span>
           </footer>
         </div>
       )}
