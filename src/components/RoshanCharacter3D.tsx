@@ -6,12 +6,15 @@ interface RoshanCharacter3DProps {
   warping: boolean;
 }
 
+function smoothstep(edge0: number, edge1: number, x: number): number {
+  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
 /**
- * Generates a high-resolution UV skin + beard texture for Three.js SphereGeometry
- * where U = 0.25 is +Z (center of face) and V = 0.5 is the equator.
- * Matches Roshan's exact groomed beard: crisp low cheek line, clean bare skin
- * flanking a neat triangular soul patch, curved mustache connecting smoothly
- * into a tight jawline beard.
+ * Computes a distortion-free skin + groomed beard texture directly in 3D unit-sphere
+ * coordinates (ux, uy, uz) where +Z is center of face, +Y is top of head, and -Y is chin.
+ * Aligned mathematically to eyes (uy≈+0.12), nose tip (uy≈-0.17), and mouth (uy≈-0.42).
  */
 function createFaceSkinBeardTexture(): THREE.CanvasTexture {
   const w = 1024;
@@ -22,86 +25,100 @@ function createFaceSkinBeardTexture(): THREE.CanvasTexture {
   const ctx = canvas.getContext('2d');
 
   if (ctx) {
-    // 1. Base warm skin tone
-    ctx.fillStyle = '#bd8158';
-    ctx.fillRect(0, 0, w, h);
+    const img = ctx.createImageData(w, h);
+    const data = img.data;
 
-    // Subtle warm cheek & forehead tonal variation
-    const faceCenterU = w * 0.25; // +Z center on SphereGeometry UV
-    const blush = ctx.createRadialGradient(faceCenterU, h * 0.48, 12, faceCenterU, h * 0.5, 190);
-    blush.addColorStop(0, 'rgba(218, 152, 110, 0.22)');
-    blush.addColorStop(1, 'rgba(148, 92, 60, 0.08)');
-    ctx.fillStyle = blush;
-    ctx.fillRect(0, 0, w, h);
+    // Base warm South Asian skin RGB (#bd8158) and groomed dark beard RGB (#18171c)
+    const skinR = 189;
+    const skinG = 129;
+    const skinB = 88;
+    const beardR = 24;
+    const beardG = 22;
+    const beardB = 26;
 
-    // 2. Sculpted Groomed Beard Mask (drawn cleanly around faceCenterU)
-    ctx.save();
-    ctx.fillStyle = '#19181d';
-    ctx.shadowColor = 'rgba(25, 24, 29, 0.65)';
-    ctx.shadowBlur = 6;
+    for (let py = 0; py < h; py++) {
+      // Three.js CanvasTexture flipY=true: py=0 -> top pole (theta=0, uy=+1), py=h-1 -> chin (uy=-1)
+      const theta = ((py + 0.5) / h) * Math.PI;
+      const sinTheta = Math.sin(theta);
+      const uy = Math.cos(theta);
 
-    // Jawline + chin + sideburn wrap (clean curved cheek line dipping below cheekbones!)
-    ctx.beginPath();
-    // Left sideburn top near ear
-    ctx.moveTo(faceCenterU - 148, h * 0.44);
-    // Clean concave cheek-line dip down toward mouth corner
-    ctx.quadraticCurveTo(faceCenterU - 122, h * 0.57, faceCenterU - 56, h * 0.61);
-    // Curve cleanly around mouth corner down below bare lower-lip cheek area
-    ctx.quadraticCurveTo(faceCenterU - 46, h * 0.67, faceCenterU - 26, h * 0.7);
-    // Under chin center
-    ctx.quadraticCurveTo(faceCenterU, h * 0.72, faceCenterU + 26, h * 0.7);
-    // Up right side of chin
-    ctx.quadraticCurveTo(faceCenterU + 46, h * 0.67, faceCenterU + 56, h * 0.61);
-    // Clean concave right cheek line up to right sideburn
-    ctx.quadraticCurveTo(faceCenterU + 122, h * 0.57, faceCenterU + 148, h * 0.44);
-    // Back edge of right sideburn down to jaw bottom
-    ctx.lineTo(faceCenterU + 165, h * 0.56);
-    ctx.quadraticCurveTo(faceCenterU + 145, h * 0.79, faceCenterU + 70, h * 0.86);
-    // Bottom of chin / under-jawline clean border
-    ctx.quadraticCurveTo(faceCenterU, h * 0.89, faceCenterU - 70, h * 0.86);
-    ctx.quadraticCurveTo(faceCenterU - 145, h * 0.79, faceCenterU - 165, h * 0.56);
-    ctx.closePath();
-    ctx.fill();
+      for (let px = 0; px < w; px++) {
+        const phi = ((px + 0.5) / w) * Math.PI * 2;
+        const ux = -Math.cos(phi) * sinTheta;
+        const uz = Math.sin(phi) * sinTheta;
+        const ax = Math.abs(ux);
 
-    // Soft natural stubble fade along the upper cheek line
-    ctx.shadowBlur = 10;
-    ctx.strokeStyle = 'rgba(25, 24, 29, 0.45)';
-    ctx.lineWidth = 4;
-    ctx.stroke();
+        let beardMask = 0;
 
-    // 3. Clean arched mustache (curved cleanly above upper lip, connecting to beard corners)
-    ctx.shadowBlur = 4;
-    ctx.fillStyle = '#16151a';
-    ctx.beginPath();
-    ctx.moveTo(faceCenterU - 54, h * 0.625);
-    ctx.quadraticCurveTo(faceCenterU - 26, h * 0.568, faceCenterU, h * 0.578);
-    ctx.quadraticCurveTo(faceCenterU + 26, h * 0.568, faceCenterU + 54, h * 0.625);
-    ctx.quadraticCurveTo(faceCenterU + 46, h * 0.64, faceCenterU + 36, h * 0.628);
-    ctx.quadraticCurveTo(faceCenterU + 16, h * 0.602, faceCenterU, h * 0.608);
-    ctx.quadraticCurveTo(faceCenterU - 16, h * 0.602, faceCenterU - 36, h * 0.628);
-    ctx.quadraticCurveTo(faceCenterU - 46, h * 0.64, faceCenterU - 54, h * 0.625);
-    ctx.closePath();
-    ctx.fill();
+        // Only evaluate beard on front/sides of face & under jaw
+        if (uz > -0.28 && uy < 0.16) {
+          // 1. Clean concave cheek line sloping from sideburns down to mouth corners
+          const cheekLineY = -0.38 + 0.52 * Math.pow(ax, 1.55);
+          const belowCheek = 1 - smoothstep(cheekLineY - 0.03, cheekLineY + 0.03, uy);
 
-    // 4. Crisp small tapered soul patch right below center of lower lip (flanked by clean bare skin!)
-    ctx.beginPath();
-    ctx.moveTo(faceCenterU - 14, h * 0.652);
-    ctx.lineTo(faceCenterU + 14, h * 0.652);
-    ctx.quadraticCurveTo(faceCenterU + 8, h * 0.705, faceCenterU, h * 0.715);
-    ctx.quadraticCurveTo(faceCenterU - 8, h * 0.705, faceCenterU - 14, h * 0.652);
-    ctx.closePath();
-    ctx.fill();
+          // Back boundary along jawline / behind ears (keeps back of neck clean)
+          const backLimitZ = -0.18 + Math.max(0, uy + 0.45) * 0.42;
+          const inFrontOfBackEdge = smoothstep(backLimitZ - 0.04, backLimitZ + 0.04, uz);
 
-    // 5. Subtle fine hair texture speckles inside beard area for realism
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
-    for (let i = 0; i < 420; i++) {
-      const rx = faceCenterU + (Math.random() - 0.5) * 280;
-      const ry = h * 0.58 + Math.random() * h * 0.27;
-      ctx.fillRect(rx, ry, 1.5, 2.5);
+          // Bottom neck trim cleanly under the chin
+          const aboveNeckBottom = smoothstep(-0.96, -0.88, uy);
+
+          let jawBeard = belowCheek * inFrontOfBackEdge * aboveNeckBottom;
+
+          // 2. Clean bare-skin cutout around lips & cheeks beside lower lip
+          if (uz > 0.35) {
+            const mouthDist = Math.hypot(ux / 0.255, (uy + 0.46) / 0.125);
+            const mouthCutout = smoothstep(0.86, 1.06, mouthDist);
+            jawBeard *= mouthCutout;
+          }
+
+          // 3. Arched groomed mustache curving down smoothly into jawline corners
+          let mustache = 0;
+          if (uz > 0.5 && ax < 0.31) {
+            const archY = -0.305 - 0.95 * ax * ax;
+            const halfThick = 0.044 * (1 - 0.28 * (ax / 0.31));
+            const distFromArch = Math.abs(uy - archY);
+            const fadeEnds = 1 - smoothstep(0.24, 0.305, ax);
+            mustache = (1 - smoothstep(halfThick - 0.014, halfThick + 0.014, distFromArch)) * fadeEnds;
+          }
+
+          // 4. Neat small tapered soul patch centered right under lower lip
+          let soulPatch = 0;
+          if (uz > 0.55 && uy < -0.47 && uy > -0.64) {
+            const halfW = 0.075 * (1 - (-0.47 - uy) * 2.2);
+            if (halfW > 0.005) {
+              const xIn = 1 - smoothstep(halfW - 0.015, halfW + 0.015, ax);
+              const yTop = 1 - smoothstep(-0.495, -0.47, uy);
+              const yBot = smoothstep(-0.635, -0.59, uy);
+              soulPatch = xIn * yTop * yBot;
+            }
+          }
+
+          beardMask = Math.max(jawBeard, mustache, soulPatch);
+
+          // Subtle natural hair-grain micro-texture inside the beard
+          if (beardMask > 0.05) {
+            const grain = ((Math.sin(px * 12.9898 + py * 78.233) * 43758.5453) % 1 + 1) % 1;
+            beardMask = Math.min(1, beardMask * (0.88 + grain * 0.16));
+          }
+        }
+
+        // Subtle warm facial shading (slightly warmer cheeks/nose)
+        const warmGlow = uz > 0 ? Math.max(0, 1 - Math.hypot(ux * 1.4, uy * 1.4)) * 10 : 0;
+
+        const r = Math.round((skinR + warmGlow) * (1 - beardMask) + beardR * beardMask);
+        const g = Math.round((skinG + warmGlow * 0.6) * (1 - beardMask) + beardG * beardMask);
+        const b = Math.round((skinB + warmGlow * 0.3) * (1 - beardMask) + beardB * beardMask);
+
+        const idx = (py * w + px) * 4;
+        data[idx] = Math.min(255, r);
+        data[idx + 1] = Math.min(255, g);
+        data[idx + 2] = Math.min(255, b);
+        data[idx + 3] = 255;
+      }
     }
 
-    ctx.restore();
+    ctx.putImageData(img, 0, 0);
   }
 
   const tex = new THREE.CanvasTexture(canvas);
@@ -214,6 +231,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
 
     // ── MATERIALS ──
     const faceTex = createFaceSkinBeardTexture();
+    faceTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const headSkinMat = new THREE.MeshStandardMaterial({
       map: faceTex,
       roughness: 0.58,
@@ -236,12 +254,6 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       color: 0x141418,
       roughness: 0.72,
       metalness: 0.06,
-    });
-
-    const beardMat = new THREE.MeshStandardMaterial({
-      color: 0x17161b,
-      roughness: 0.8,
-      metalness: 0.04,
     });
 
     const scleraMat = new THREE.MeshStandardMaterial({
@@ -473,32 +485,15 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     }
     headGeo.computeVertexNormals();
 
-    // Rotate head mesh by -PI/2? Wait: SphereGeometry default U=0.25 maps to +Z when unrotated!
-    // Let's verify: in Three.js SphereGeometry, phi=0 is -X, phi=PI/2 (U=0.25) is +Z!
     const headMesh = new THREE.Mesh(headGeo, headSkinMat);
     headMesh.castShadow = true;
     headGroup.add(headMesh);
 
-    // Subtle 3D sculpted mustache volume right over the painted mustache for tactile depth
-    for (const side of [-1, 1]) {
-      const stache = new THREE.Mesh(new THREE.CapsuleGeometry(0.024, 0.12, 8, 12), beardMat);
-      stache.position.set(side * 0.075, -0.195, 0.482);
-      stache.rotation.z = Math.PI / 2 - side * 0.24;
-      stache.rotation.y = side * -0.22;
-      headGroup.add(stache);
-    }
-
-    // Subtle warm lip line cleanly framed between mustache and soul patch
-    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.02, 0.12, 8, 12), lipMat);
+    // Clean warm lip line centered naturally inside the bare-skin mouth region
+    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.02, 0.125, 8, 12), lipMat);
     mouth.rotation.z = Math.PI / 2;
-    mouth.position.set(0, -0.255, 0.478);
+    mouth.position.set(0, -0.255, 0.476);
     headGroup.add(mouth);
-
-    // Subtle sculpted rounded chin beard trim under jaw (zero bulky helmet!)
-    const chinTrim = new THREE.Mesh(new THREE.SphereGeometry(0.24, 20, 16), beardMat);
-    chinTrim.scale.set(1.12, 0.56, 0.95);
-    chinTrim.position.set(0, -0.495, 0.18);
-    headGroup.add(chinTrim);
 
     // Ears
     for (const side of [-1, 1]) {
