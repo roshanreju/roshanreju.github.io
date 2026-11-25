@@ -31,13 +31,9 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       return;
     }
 
-    const getSize = () => ({
-      w: container.clientWidth || window.innerWidth,
-      h: container.clientHeight || window.innerHeight,
-    });
-
-    const initial = getSize();
-    renderer.setSize(initial.w, initial.h);
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || window.innerHeight;
+    renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -48,30 +44,31 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x050507, 0.042);
 
-    const camera = new THREE.PerspectiveCamera(36, initial.w / initial.h, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
     const applyCameraFraming = (w: number, h: number) => {
       camera.aspect = w / h;
       if (window.innerWidth >= 1024) {
+        // Shift viewport offset so character sits cleanly on the right while rotating around his true center
         camera.setViewOffset(w, h, -w * 0.17, 0, w, h);
       } else {
         camera.clearViewOffset();
       }
       camera.updateProjectionMatrix();
     };
-    applyCameraFraming(initial.w, initial.h);
-    camera.position.set(0.28, 0.65, window.innerWidth >= 1024 ? 5.3 : 5.1);
+    applyCameraFraming(width, height);
+    camera.position.set(0.35, 0.72, window.innerWidth >= 1024 ? 5.4 : 5.1);
 
-    // ── INTERACTIVE 360° ORBIT CONTROLS ──
+    // ── INTERACTIVE 360° ORBIT CONTROLS (Drag to spin, look from any angle!) ──
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
     controls.enablePan = false;
     controls.enableZoom = window.innerWidth >= 1024;
-    controls.minDistance = 3.5;
+    controls.minDistance = 3.4;
     controls.maxDistance = 7.4;
     controls.minPolarAngle = Math.PI * 0.28;
     controls.maxPolarAngle = Math.PI * 0.68;
-    controls.target.set(0, 0.2, 0);
+    controls.target.set(0, 0.25, 0);
     controls.update();
 
     let isDragging = false;
@@ -82,11 +79,11 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       isDragging = false;
     });
 
-    // ── STUDIO PORTRAIT LIGHTING ──
-    const hemiLight = new THREE.HemisphereLight(0xfff1e6, 0x1a080b, 0.9);
+    // ── STUDIO PORTRAIT LIGHTING (Warm key + Crimson rim + Laptop underglow) ──
+    const hemiLight = new THREE.HemisphereLight(0xfff1e6, 0x1a080b, 0.85);
     scene.add(hemiLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfff5eb, 2.05);
+    const keyLight = new THREE.DirectionalLight(0xfff5eb, 2.1);
     keyLight.position.set(3.5, 5.2, 4.5);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(1024, 1024);
@@ -108,13 +105,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     screenUnderGlow.position.set(0, -0.05, 1.05);
     scene.add(screenUnderGlow);
 
-    // ── MATERIALS ──
-    const headSkinMat = new THREE.MeshStandardMaterial({
-      vertexColors: true,
-      roughness: 0.62,
-      metalness: 0.03,
-    });
-
+    // ── STYLIZED PIXAR / COLLECTIBLE CHARACTER MATERIALS ──
     const skinMat = new THREE.MeshStandardMaterial({
       color: 0xbd8158,
       roughness: 0.56,
@@ -122,8 +113,8 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     });
 
     const lipMat = new THREE.MeshStandardMaterial({
-      color: 0x9b624d,
-      roughness: 0.52,
+      color: 0x8f5542,
+      roughness: 0.5,
       metalness: 0.02,
     });
 
@@ -131,6 +122,12 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       color: 0x141418,
       roughness: 0.72,
       metalness: 0.06,
+    });
+
+    const beardMat = new THREE.MeshStandardMaterial({
+      color: 0x18171c,
+      roughness: 0.82,
+      metalness: 0.04,
     });
 
     const scleraMat = new THREE.MeshStandardMaterial({
@@ -199,7 +196,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     const characterRoot = new THREE.Group();
     scene.add(characterRoot);
 
-    // Pedestal
+    // Floating obsidian studio pedestal with subtle crimson ring
     const pedestalGroup = new THREE.Group();
     pedestalGroup.position.set(0, -1.25, 0);
     characterRoot.add(pedestalGroup);
@@ -219,10 +216,11 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     discRing.position.y = 0.07;
     pedestalGroup.add(discRing);
 
-    // ── TORSO & ARMS ──
+    // ── TORSO & ARMS GROUP (Breathing idle motion!) ──
     const bodyGroup = new THREE.Group();
     characterRoot.add(bodyGroup);
 
+    // Torso (Black Streetwear Hoodie)
     const torsoGeo = new THREE.CapsuleGeometry(0.58, 0.72, 16, 28);
     torsoGeo.scale(1.12, 1, 0.74);
     const torso = new THREE.Mesh(torsoGeo, hoodieMat);
@@ -230,6 +228,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     torso.castShadow = true;
     bodyGroup.add(torso);
 
+    // Crisp Hoodie Collar + Relaxed Back Hood with Crimson Inner Lining
     const collarOuter = new THREE.Mesh(
       new THREE.TorusGeometry(0.42, 0.14, 16, 36),
       hoodieMat
@@ -255,6 +254,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     hoodInnerAccent.position.set(0, 0.25, -0.02);
     bodyGroup.add(hoodInnerAccent);
 
+    // Hoodie Drawstrings with Crimson Aglets
     for (const side of [-1, 1]) {
       const string = new THREE.Mesh(
         new THREE.CylinderGeometry(0.016, 0.016, 0.42, 10),
@@ -272,6 +272,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       bodyGroup.add(aglet);
     }
 
+    // Arms & Hands angled naturally forward toward floating laptop
     const buildArm = (side: -1 | 1) => {
       const arm = new THREE.Group();
       arm.position.set(side * 0.66, 0.06, 0.02);
@@ -307,7 +308,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     bodyGroup.add(buildArm(-1));
     bodyGroup.add(buildArm(1));
 
-    // Matte-Black Laptop
+    // Sleek Matte-Black Hacker Laptop Resting in Front
     const laptopGroup = new THREE.Group();
     laptopGroup.position.set(0, -0.66, 0.94);
     bodyGroup.add(laptopGroup);
@@ -324,11 +325,13 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     laptopLid.position.set(0, 0.29, 0);
     laptopLidPivot.add(laptopLid);
 
+    // Subtle crimson emblem on back of laptop lid (visible when rotating 360°!)
     const lidBadge = new THREE.Mesh(new THREE.OctahedronGeometry(0.065, 0), crimsonAccentMat);
     lidBadge.scale.set(1, 1, 0.3);
     lidBadge.position.set(0, 0.29, 0.022);
     laptopLidPivot.add(lidBadge);
 
+    // Glowing inner terminal screen
     const laptopScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.86, 0.48), laptopScreenMat);
     laptopScreen.position.set(0, 0.29, -0.018);
     laptopScreen.rotation.y = Math.PI;
@@ -339,106 +342,34 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     neck.position.set(0, 0.36, 0.02);
     bodyGroup.add(neck);
 
-    // ── HEAD GROUP WITH NATURAL SOFT-FADED SHORT FULL BEARD (Computed in exact 3D vertex space) ──
+    // ── HEAD GROUP (Tracks cursor + blinks naturally!) ──
     const headGroup = new THREE.Group();
     headGroup.position.set(0, 0.95, 0.03);
     bodyGroup.add(headGroup);
 
-    const smoothstep = (e0: number, e1: number, val: number) => {
-      const t = Math.max(0, Math.min(1, (val - e0) / (e1 - e0)));
-      return t * t * (3 - 2 * t);
-    };
-
-    const headGeo = new THREE.SphereGeometry(0.54, 128, 96);
+    // Sculpted Organic Stylized Human Head (slight jawline taper)
+    const headGeo = new THREE.SphereGeometry(0.54, 36, 32);
     const posAttr = headGeo.attributes.position as THREE.BufferAttribute;
-    const colors = new Float32Array(posAttr.count * 3);
-
-    const skinColor = new THREE.Color(0xbd8158);
-    const beardColor = new THREE.Color(0x211b18);
-    const tmpColor = new THREE.Color();
-
     for (let i = 0; i < posAttr.count; i++) {
       let x = posAttr.getX(i);
       let y = posAttr.getY(i);
       let z = posAttr.getZ(i);
-
-      // Sculpted oval head with gentle natural jaw taper
+      // Slightly oval head shape
       y *= 1.12;
       x *= 0.93;
       z *= 0.97;
+      // Gently taper lower jaw into natural chin
       if (y < 0) {
         const taper = 1 - Math.abs(y) * 0.24;
         x *= taper;
         z *= 1 - Math.abs(y) * 0.1;
       }
-
-      // Evaluate soft, even short-beard stubble directly in exact final 3D (x, y, z)
-      const ax = Math.abs(x);
-      let beardDensity = 0;
-
-      if (z > -0.14 && y < 0.12) {
-        // Natural curved full-beard cheek line: below nose in center, sweeping gently up to sideburns
-        const cheekLineY = -0.172 + 1.12 * Math.pow(ax, 2.05);
-        const belowCheek = 1 - smoothstep(cheekLineY - 0.04, cheekLineY + 0.045, y);
-
-        // Soft back fade along the jaw angle so nothing bleeds behind the neck/ears
-        const backZ = -0.05 + Math.max(0, y + 0.22) * 0.34;
-        const inFrontOfBack = smoothstep(backZ - 0.055, backZ + 0.055, z);
-
-        // Clean neck trim under the chin
-        const aboveNeck = smoothstep(-0.59, -0.51, y);
-
-        beardDensity = belowCheek * inFrontOfBack * aboveNeck;
-
-        // Clean natural lip opening right around the mouth (y = -0.265)
-        if (z > 0.28) {
-          const lipDist = Math.hypot(x / 0.145, (y + 0.268) / 0.056);
-          const lipOpening = smoothstep(0.62, 1.12, lipDist);
-          beardDensity *= lipOpening;
-
-          // Subtle natural lower-density dimples on either side of the soul patch
-          const leftDimple = Math.hypot((x + 0.105) / 0.075, (y + 0.345) / 0.055);
-          const rightDimple = Math.hypot((x - 0.105) / 0.075, (y + 0.345) / 0.055);
-          const dimpleFade = 0.62 + 0.38 * Math.min(smoothstep(0.4, 1.15, leftDimple), smoothstep(0.4, 1.15, rightDimple));
-          beardDensity *= dimpleFade;
-        }
-
-        // Slightly fuller density along chin & mustache, softer fade near upper cheek line
-        const cheekSoftness = 0.72 + 0.28 * (1 - smoothstep(-0.32, -0.12, y));
-        // Fine subtle deterministic grain for organic short stubble texture
-        const grain = 0.92 + 0.12 * Math.sin(x * 115 + y * 140 + z * 95);
-        beardDensity = Math.max(0, Math.min(0.84, beardDensity * cheekSoftness * 0.8 * grain));
-      }
-
-      // Subtle +7mm 3D stubble fullness along jaw & chin (zero bulky blobs!)
-      if (beardDensity > 0.02) {
-        const len = Math.hypot(x, y, z) || 1;
-        const bump = beardDensity * 0.011;
-        x += (x / len) * bump;
-        y += (y / len) * bump;
-        z += (z / len) * bump;
-      }
-
       posAttr.setXYZ(i, x, y, z);
-
-      tmpColor.copy(skinColor).lerp(beardColor, beardDensity);
-      colors[i * 3] = tmpColor.r;
-      colors[i * 3 + 1] = tmpColor.g;
-      colors[i * 3 + 2] = tmpColor.b;
     }
-
-    headGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     headGeo.computeVertexNormals();
-
-    const headMesh = new THREE.Mesh(headGeo, headSkinMat);
+    const headMesh = new THREE.Mesh(headGeo, skinMat);
     headMesh.castShadow = true;
     headGroup.add(headMesh);
-
-    // Subtle natural mouth tucked cleanly inside the lip opening
-    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.017, 0.115, 8, 12), lipMat);
-    mouth.rotation.z = Math.PI / 2;
-    mouth.position.set(0, -0.266, 0.456);
-    headGroup.add(mouth);
 
     // Ears
     for (const side of [-1, 1]) {
@@ -448,18 +379,18 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       headGroup.add(ear);
     }
 
-    // Nose
-    const noseBridge = new THREE.Mesh(new THREE.CapsuleGeometry(0.048, 0.13, 10, 14), skinMat);
-    noseBridge.position.set(0, -0.015, 0.505);
+    // Soft Sculpted Nose
+    const noseBridge = new THREE.Mesh(new THREE.CapsuleGeometry(0.052, 0.13, 10, 14), skinMat);
+    noseBridge.position.set(0, -0.02, 0.51);
     noseBridge.rotation.x = -0.18;
     headGroup.add(noseBridge);
 
-    const noseTip = new THREE.Mesh(new THREE.SphereGeometry(0.064, 14, 14), skinMat);
-    noseTip.scale.set(1.12, 0.82, 0.92);
-    noseTip.position.set(0, -0.105, 0.535);
+    const noseTip = new THREE.Mesh(new THREE.SphereGeometry(0.068, 14, 14), skinMat);
+    noseTip.scale.set(1.15, 0.85, 0.95);
+    noseTip.position.set(0, -0.11, 0.54);
     headGroup.add(noseTip);
 
-    // Eyes with blinking & pupil gaze
+    // Eyes (with animated blink & subtle pupil gaze!)
     const leftEyeGroup = new THREE.Group();
     leftEyeGroup.position.set(-0.18, 0.07, 0.45);
     headGroup.add(leftEyeGroup);
@@ -489,6 +420,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       eyeGrp.add(pupilGrp);
       pupilGroups.push(pupilGrp);
 
+      // Eyelid for smooth natural blinking
       const lid = new THREE.Mesh(
         new THREE.SphereGeometry(0.092, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55),
         skinMat
@@ -499,7 +431,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       eyelidMeshes.push(lid);
     });
 
-    // Eyebrows
+    // Expressive Thick Dark Eyebrows
     for (const side of [-1, 1]) {
       const brow = new THREE.Mesh(new THREE.CapsuleGeometry(0.028, 0.17, 8, 12), hairMat);
       brow.rotation.z = Math.PI / 2 - side * 0.08;
@@ -507,7 +439,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       headGroup.add(brow);
     }
 
-    // Thick Dark Rectangular Glasses
+    // ── SIGNATURE THICK DARK RECTANGULAR GLASSES (Matching Roshan's photo!) ──
     const glassesGroup = new THREE.Group();
     glassesGroup.position.set(0, 0.07, 0.55);
     headGroup.add(glassesGroup);
@@ -516,6 +448,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       const grp = new THREE.Group();
       grp.position.set(side * 0.205, 0, 0);
 
+      // Top, bottom, left, right sleek rectangular rim bars
       const topBar = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.036, 0.042), frameMat);
       topBar.position.y = 0.11;
       grp.add(topBar);
@@ -532,6 +465,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       innerBar.position.x = side * -0.145;
       grp.add(innerBar);
 
+      // Glossy subtle reflective glass lens
       const lens = new THREE.Mesh(new THREE.PlaneGeometry(0.27, 0.19), lensMat);
       grp.add(lens);
 
@@ -541,6 +475,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     glassesGroup.add(buildLensFrame(-1));
     glassesGroup.add(buildLensFrame(1));
 
+    // Nose bridge & temple arms back to ears
     const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.036, 0.04), frameMat);
     bridge.position.set(0, 0.07, 0.01);
     glassesGroup.add(bridge);
@@ -552,10 +487,67 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       glassesGroup.add(temple);
     }
 
-    // Voluminous Swept Black Hair
+    // ── SIGNATURE GROOMED FULL BEARD & MUSTACHE ──
+    const beardGroup = new THREE.Group();
+    headGroup.add(beardGroup);
+
+    // Sculpted lower jaw beard cap conforming closely to the chin/cheeks
+    const beardGeo = new THREE.SphereGeometry(0.545, 32, 24, 0, Math.PI * 2, Math.PI * 0.56, Math.PI * 0.44);
+    const bPos = beardGeo.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < bPos.count; i++) {
+      let x = bPos.getX(i);
+      let y = bPos.getY(i);
+      let z = bPos.getZ(i);
+      y *= 1.13;
+      x *= 0.945;
+      z *= 0.99;
+      if (y < 0) {
+        const taper = 1 - Math.abs(y) * 0.22;
+        x *= taper;
+      }
+      // Trim back of neck so beard wraps front/jawline cleanly
+      if (z < -0.12) {
+        z = -0.12 + (z + 0.12) * 0.25;
+      }
+      bPos.setXYZ(i, x, y, z);
+    }
+    beardGeo.computeVertexNormals();
+    const beardJaw = new THREE.Mesh(beardGeo, beardMat);
+    beardGroup.add(beardJaw);
+
+    // Sideburns connecting cleanly up to hair
+    for (const side of [-1, 1]) {
+      const sideburn = new THREE.Mesh(new THREE.CapsuleGeometry(0.065, 0.22, 8, 12), beardMat);
+      sideburn.position.set(side * 0.44, 0.02, 0.12);
+      sideburn.rotation.z = side * -0.12;
+      beardGroup.add(sideburn);
+    }
+
+    // Mustache (curved natural arcs)
+    for (const side of [-1, 1]) {
+      const stache = new THREE.Mesh(new THREE.CapsuleGeometry(0.036, 0.13, 8, 12), beardMat);
+      stache.position.set(side * 0.085, -0.21, 0.49);
+      stache.rotation.z = Math.PI / 2 - side * 0.28;
+      stache.rotation.y = side * -0.22;
+      beardGroup.add(stache);
+    }
+
+    // Subtle confident mouth + soul patch
+    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.022, 0.14, 8, 12), lipMat);
+    mouth.rotation.z = Math.PI / 2;
+    mouth.position.set(0, -0.275, 0.485);
+    headGroup.add(mouth);
+
+    const soulPatch = new THREE.Mesh(new THREE.ConeGeometry(0.048, 0.11, 10), beardMat);
+    soulPatch.rotation.x = Math.PI;
+    soulPatch.position.set(0, -0.355, 0.475);
+    beardGroup.add(soulPatch);
+
+    // ── SIGNATURE VOLUMINOUS SWEPT BLACK HAIR (Matching Roshan's photo!) ──
     const hairGroup = new THREE.Group();
     headGroup.add(hairGroup);
 
+    // Fitted dark tapered base cap for sides & back
     const hairBase = new THREE.Mesh(
       new THREE.SphereGeometry(0.555, 30, 22, 0, Math.PI * 2, 0, Math.PI * 0.56),
       hairMat
@@ -565,7 +557,9 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     hairBase.position.set(0, 0.03, -0.04);
     hairGroup.add(hairBase);
 
+    // Sculpted layered wavy top quiff swept upward & slightly right
     const hairPuffs: [number, number, number, number, number, number][] = [
+      // [x, y, z, rx, ry, rz]
       [0.0, 0.58, 0.12, 0.34, 0.22, 0.28],
       [-0.22, 0.54, 0.18, 0.24, 0.18, 0.22],
       [0.24, 0.56, 0.16, 0.26, 0.2, 0.24],
@@ -589,8 +583,8 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       hairGroup.add(puff);
     });
 
-    // Subtle dust
-    const dustCount = 80;
+    // Subtle floating studio crimson dust specks
+    const dustCount = 90;
     const dustPos = new Float32Array(dustCount * 3);
     for (let i = 0; i < dustCount; i++) {
       dustPos[i * 3] = (Math.random() - 0.5) * 12;
@@ -601,10 +595,11 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
     const dust = new THREE.Points(
       dustGeo,
-      new THREE.PointsMaterial({ color: 0xef4444, size: 0.032, transparent: true, opacity: 0.4 })
+      new THREE.PointsMaterial({ color: 0xef4444, size: 0.032, transparent: true, opacity: 0.42 })
     );
     scene.add(dust);
 
+    // ── POINTER GAZE TRACKING ──
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
     const onMove = (e: MouseEvent) => {
       mouse.tx = (e.clientX / window.innerWidth) * 2 - 1;
@@ -614,13 +609,15 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
 
     const onResize = () => {
       if (!container) return;
-      const { w, h } = getSize();
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
       applyCameraFraming(w, h);
       controls.enableZoom = window.innerWidth >= 1024;
       renderer.setSize(w, h);
     };
     window.addEventListener('resize', onResize);
 
+    // ── ANIMATION LOOP (Breathing, Blinking, Cursor Gaze, Orbit Damping & Warp!) ──
     const startTime = performance.now();
     let nextBlinkAt = 2.8;
     let frameId = 0;
@@ -633,11 +630,13 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       mouse.x += (mouse.tx - mouse.x) * 0.07;
       mouse.y += (mouse.ty - mouse.y) * 0.07;
 
+      // Subtle living breathing + float
       bodyGroup.position.y = Math.sin(t * 1.5) * 0.045;
       laptopGroup.position.y = -0.66 + Math.sin(t * 1.5 + 0.5) * 0.02;
 
-      const targetHeadY = isDragging ? 0 : mouse.x * 0.4;
-      const targetHeadX = isDragging ? 0 : -mouse.y * 0.2;
+      // Head & eyes naturally look toward visitor cursor when not dragging
+      const targetHeadY = isDragging ? 0 : mouse.x * 0.42;
+      const targetHeadX = isDragging ? 0 : -mouse.y * 0.22;
       headGroup.rotation.y += (targetHeadY - headGroup.rotation.y) * 0.08;
       headGroup.rotation.x += (targetHeadX - headGroup.rotation.x) * 0.08;
 
@@ -646,6 +645,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
         p.position.y = isDragging ? 0 : mouse.y * 0.014;
       });
 
+      // Natural blinking every ~3.5-5 seconds
       let blinkClosed = 0;
       if (t >= nextBlinkAt && t < nextBlinkAt + 0.16) {
         blinkClosed = Math.sin(((t - nextBlinkAt) / 0.16) * Math.PI);
@@ -656,8 +656,11 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
         lid.rotation.x = -Math.PI * 0.48 + blinkClosed * Math.PI * 0.52;
       });
 
+      // Laptop terminal pulse
       screenUnderGlow.intensity = 4.0 + Math.sin(t * 3.5) * 0.9 + (isWarp ? 12 : 0);
       laptopScreenMat.emissiveIntensity = 0.85 + Math.sin(t * 3.5) * 0.2 + (isWarp ? 2.5 : 0);
+
+      // Gentle drifting embers
       dust.rotation.y = t * 0.025;
 
       if (isWarp) {
