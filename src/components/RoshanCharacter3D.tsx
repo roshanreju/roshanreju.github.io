@@ -144,9 +144,9 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     const catchlightMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     const frameMat = new THREE.MeshStandardMaterial({
-      color: 0x1d222b,
-      roughness: 0.28,
-      metalness: 0.45,
+      color: 0x0d0e12,
+      roughness: 0.16,
+      metalness: 0.35,
     });
 
     const lensMat = new THREE.MeshPhysicalMaterial({
@@ -220,9 +220,9 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     const bodyGroup = new THREE.Group();
     characterRoot.add(bodyGroup);
 
-    // Torso (Black Streetwear Hoodie)
-    const torsoGeo = new THREE.CapsuleGeometry(0.58, 0.72, 16, 28);
-    torsoGeo.scale(1.12, 1, 0.74);
+    // Torso (Athletic shoulders + Black Streetwear Hoodie)
+    const torsoGeo = new THREE.CapsuleGeometry(0.59, 0.72, 16, 28);
+    torsoGeo.scale(1.18, 1, 0.74);
     const torso = new THREE.Mesh(torsoGeo, hoodieMat);
     torso.position.set(0, -0.45, 0);
     torso.castShadow = true;
@@ -439,7 +439,7 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       headGroup.add(brow);
     }
 
-    // ── SIGNATURE THICK DARK RECTANGULAR GLASSES (Matching Roshan's photo!) ──
+    // ── SIGNATURE BOLD BLACK WAYFARER GLASSES (Matching Photos #1, #4, #5) ──
     const glassesGroup = new THREE.Group();
     glassesGroup.position.set(0, 0.07, 0.55);
     headGroup.add(glassesGroup);
@@ -448,24 +448,23 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       const grp = new THREE.Group();
       grp.position.set(side * 0.205, 0, 0);
 
-      // Top, bottom, left, right sleek rectangular rim bars
-      const topBar = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.036, 0.042), frameMat);
-      topBar.position.y = 0.11;
+      // Bold glossy black Wayfarer browline + clean rectangular rims
+      const topBar = new THREE.Mesh(new THREE.BoxGeometry(0.335, 0.048, 0.046), frameMat);
+      topBar.position.y = 0.112;
       grp.add(topBar);
 
-      const botBar = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.028, 0.04), frameMat);
+      const botBar = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.032, 0.042), frameMat);
       botBar.position.y = -0.105;
       grp.add(botBar);
 
-      const outerBar = new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.23, 0.04), frameMat);
-      outerBar.position.x = side * 0.15;
+      const outerBar = new THREE.Mesh(new THREE.BoxGeometry(0.038, 0.235, 0.044), frameMat);
+      outerBar.position.x = side * 0.152;
       grp.add(outerBar);
 
-      const innerBar = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.22, 0.04), frameMat);
-      innerBar.position.x = side * -0.145;
+      const innerBar = new THREE.Mesh(new THREE.BoxGeometry(0.034, 0.225, 0.042), frameMat);
+      innerBar.position.x = side * -0.146;
       grp.add(innerBar);
 
-      // Glossy subtle reflective glass lens
       const lens = new THREE.Mesh(new THREE.PlaneGeometry(0.27, 0.19), lensMat);
       grp.add(lens);
 
@@ -475,39 +474,40 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     glassesGroup.add(buildLensFrame(-1));
     glassesGroup.add(buildLensFrame(1));
 
-    // Nose bridge & temple arms back to ears
-    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.036, 0.04), frameMat);
-    bridge.position.set(0, 0.07, 0.01);
+    // Bold Wayfarer nose bridge & side temples
+    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.135, 0.044, 0.044), frameMat);
+    bridge.position.set(0, 0.078, 0.01);
     glassesGroup.add(bridge);
 
     for (const side of [-1, 1]) {
-      const temple = new THREE.Mesh(new THREE.BoxGeometry(0.028, 0.032, 0.58), frameMat);
-      temple.position.set(side * 0.36, 0.07, -0.27);
+      const temple = new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.044, 0.58), frameMat);
+      temple.position.set(side * 0.362, 0.075, -0.27);
       temple.rotation.y = side * -0.16;
       glassesGroup.add(temple);
     }
 
-    // ── SIGNATURE GROOMED FULL BEARD & MUSTACHE ──
+    // ── CRISP BOXED FULL BEARD & MUSTACHE (Matched to all 5 angles: front + side profiles #4 & #5) ──
     const beardGroup = new THREE.Group();
     headGroup.add(beardGroup);
 
-    // Sculpted lower jaw beard cap conforming closely to the chin/cheeks
-    const beardGeo = new THREE.SphereGeometry(0.545, 32, 24, 0, Math.PI * 2, Math.PI * 0.56, Math.PI * 0.44);
+    // Clean boxed full jaw & chin shell with crisp low cheek line and sharp vertical back-jaw line
+    const beardGeo = new THREE.SphereGeometry(0.546, 36, 26, 0, Math.PI * 2, Math.PI * 0.595, Math.PI * 0.405);
     const bPos = beardGeo.attributes.position as THREE.BufferAttribute;
     for (let i = 0; i < bPos.count; i++) {
       let x = bPos.getX(i);
       let y = bPos.getY(i);
       let z = bPos.getZ(i);
-      y *= 1.13;
-      x *= 0.945;
-      z *= 0.99;
+      y *= 1.128;
+      x *= 0.942;
+      z *= 0.985;
       if (y < 0) {
-        const taper = 1 - Math.abs(y) * 0.22;
+        const taper = 1 - Math.abs(y) * 0.225;
         x *= taper;
       }
-      // Trim back of neck so beard wraps front/jawline cleanly
-      if (z < -0.12) {
-        z = -0.12 + (z + 0.12) * 0.25;
+      // Crisp vertical back-jawline edge cleanly in front of ear lobe (matching side profiles #4 & #5)
+      if (z < -0.02) {
+        z = -0.02 + (z + 0.02) * 0.16;
+        x *= 0.94;
       }
       bPos.setXYZ(i, x, y, z);
     }
@@ -515,72 +515,87 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     const beardJaw = new THREE.Mesh(beardGeo, beardMat);
     beardGroup.add(beardJaw);
 
-    // Sideburns connecting cleanly up to hair
+    // Slim flush sideburn fade connecting beard neatly toward temples
     for (const side of [-1, 1]) {
-      const sideburn = new THREE.Mesh(new THREE.CapsuleGeometry(0.065, 0.22, 8, 12), beardMat);
-      sideburn.position.set(side * 0.44, 0.02, 0.12);
-      sideburn.rotation.z = side * -0.12;
+      const sideburn = new THREE.Mesh(new THREE.CapsuleGeometry(0.034, 0.16, 8, 12), beardMat);
+      sideburn.position.set(side * 0.445, -0.01, 0.07);
+      sideburn.rotation.z = side * -0.08;
       beardGroup.add(sideburn);
     }
 
-    // Mustache (curved natural arcs)
+    // Connected full curved mustache
     for (const side of [-1, 1]) {
-      const stache = new THREE.Mesh(new THREE.CapsuleGeometry(0.036, 0.13, 8, 12), beardMat);
-      stache.position.set(side * 0.085, -0.21, 0.49);
-      stache.rotation.z = Math.PI / 2 - side * 0.28;
+      const stache = new THREE.Mesh(new THREE.CapsuleGeometry(0.032, 0.135, 8, 12), beardMat);
+      stache.position.set(side * 0.085, -0.208, 0.488);
+      stache.rotation.z = Math.PI / 2 - side * 0.27;
       stache.rotation.y = side * -0.22;
       beardGroup.add(stache);
     }
 
-    // Subtle confident mouth + soul patch
-    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.022, 0.14, 8, 12), lipMat);
+    // Confident slight warm smile + neat small rounded soul patch
+    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.02, 0.135, 8, 12), lipMat);
     mouth.rotation.z = Math.PI / 2;
-    mouth.position.set(0, -0.275, 0.485);
+    mouth.position.set(0, -0.268, 0.482);
     headGroup.add(mouth);
 
-    const soulPatch = new THREE.Mesh(new THREE.ConeGeometry(0.048, 0.11, 10), beardMat);
-    soulPatch.rotation.x = Math.PI;
-    soulPatch.position.set(0, -0.355, 0.475);
+    const soulPatch = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 12), beardMat);
+    soulPatch.scale.set(0.88, 1.2, 0.48);
+    soulPatch.position.set(0, -0.34, 0.468);
     beardGroup.add(soulPatch);
 
-    // ── SIGNATURE VOLUMINOUS SWEPT BLACK HAIR (Matching Roshan's photo!) ──
+    // ── CURLY TEXTURED BLACK TOP + CLEAN HIGH SKIN FADE (Matched to Photos #1-#5!) ──
     const hairGroup = new THREE.Group();
     headGroup.add(hairGroup);
 
-    // Fitted dark tapered base cap for sides & back
+    // Raised tapered cap leaving clean high-fade sides above the ears
     const hairBase = new THREE.Mesh(
-      new THREE.SphereGeometry(0.555, 30, 22, 0, Math.PI * 2, 0, Math.PI * 0.56),
+      new THREE.SphereGeometry(0.552, 30, 22, 0, Math.PI * 2, 0, Math.PI * 0.44),
       hairMat
     );
-    hairBase.scale.set(0.95, 1.12, 0.99);
-    hairBase.rotation.x = -0.22;
-    hairBase.position.set(0, 0.03, -0.04);
+    hairBase.scale.set(0.94, 1.11, 0.98);
+    hairBase.rotation.x = -0.18;
+    hairBase.position.set(0, 0.08, -0.04);
     hairGroup.add(hairBase);
 
-    // Sculpted layered wavy top quiff swept upward & slightly right
-    const hairPuffs: [number, number, number, number, number, number][] = [
-      // [x, y, z, rx, ry, rz]
-      [0.0, 0.58, 0.12, 0.34, 0.22, 0.28],
-      [-0.22, 0.54, 0.18, 0.24, 0.18, 0.22],
-      [0.24, 0.56, 0.16, 0.26, 0.2, 0.24],
-      [0.12, 0.65, 0.02, 0.32, 0.22, 0.28],
-      [-0.14, 0.62, -0.02, 0.28, 0.2, 0.25],
-      [0.34, 0.45, 0.06, 0.2, 0.18, 0.22],
-      [-0.35, 0.42, 0.06, 0.19, 0.17, 0.2],
-      [0.0, 0.52, -0.22, 0.36, 0.24, 0.26],
-      [-0.24, 0.44, -0.26, 0.26, 0.22, 0.22],
-      [0.24, 0.44, -0.26, 0.26, 0.22, 0.22],
-      [0.06, 0.54, 0.32, 0.24, 0.16, 0.16],
-      [-0.16, 0.49, 0.31, 0.2, 0.14, 0.14],
+    // Tightly clustered natural curly texture across the crown & forward fringe
+    const curlyClusters: [number, number, number, number][] = [
+      // Front fringe & curly top volume
+      [0.0, 0.62, 0.22, 0.18],
+      [-0.17, 0.59, 0.25, 0.16],
+      [0.18, 0.6, 0.23, 0.16],
+      [-0.31, 0.52, 0.18, 0.14],
+      [0.31, 0.53, 0.17, 0.14],
+      [-0.08, 0.56, 0.34, 0.13],
+      [0.11, 0.57, 0.33, 0.13],
+      [-0.24, 0.51, 0.3, 0.12],
+      [0.24, 0.52, 0.29, 0.12],
+      // Upper crown dense curls
+      [0.0, 0.71, 0.06, 0.19],
+      [-0.18, 0.69, 0.06, 0.17],
+      [0.19, 0.7, 0.05, 0.17],
+      [-0.33, 0.6, 0.02, 0.14],
+      [0.33, 0.6, 0.02, 0.14],
+      [-0.09, 0.74, -0.06, 0.16],
+      [0.11, 0.73, -0.07, 0.16],
+      // Mid/back crown tapering cleanly into high fade
+      [0.0, 0.64, -0.18, 0.19],
+      [-0.21, 0.59, -0.17, 0.16],
+      [0.21, 0.59, -0.17, 0.16],
+      [-0.32, 0.49, -0.14, 0.13],
+      [0.32, 0.49, -0.14, 0.13],
+      [0.0, 0.51, -0.32, 0.17],
+      [-0.18, 0.47, -0.31, 0.15],
+      [0.18, 0.47, -0.31, 0.15],
     ];
 
-    const puffGeo = new THREE.SphereGeometry(1, 18, 16);
-    hairPuffs.forEach(([x, y, z, sx, sy, sz]) => {
-      const puff = new THREE.Mesh(puffGeo, hairMat);
-      puff.position.set(x, y, z);
-      puff.scale.set(sx, sy, sz);
-      puff.castShadow = true;
-      hairGroup.add(puff);
+    const curlGeo = new THREE.IcosahedronGeometry(1, 1);
+    curlyClusters.forEach(([x, y, z, r], idx) => {
+      const curl = new THREE.Mesh(curlGeo, hairMat);
+      curl.position.set(x, y, z);
+      curl.scale.set(r * 1.08, r * 0.92, r * 1.04);
+      curl.rotation.set(idx * 0.7, idx * 1.1, idx * 0.4);
+      curl.castShadow = true;
+      hairGroup.add(curl);
     });
 
     // Subtle floating studio crimson dust specks
