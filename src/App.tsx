@@ -97,7 +97,7 @@ export default function App() {
               </h1>
 
               <p className="mt-3 font-mono text-sm font-medium text-red-400 sm:text-base">
-                Red Team @ Google
+                Red Team Consultant @ Google
               </p>
 
               <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-zinc-400 sm:text-base lg:mx-0">

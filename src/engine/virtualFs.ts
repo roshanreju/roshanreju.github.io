@@ -329,7 +329,7 @@ export function getWelcomeBlock(): ShellBlock {
       { text: '  └───────────────────────────┘', tone: 'red' },
       { text: '', tone: 'default' },
       { text: `  operator  :: ${PROFILE.name} (${PROFILE.handle})`, tone: 'white' },
-      { text: '  role      :: Red Team @ Google', tone: 'default' },
+      { text: '  role      :: Red Team Consultant @ Google', tone: 'default' },
       { text: '  location  :: Chicago, IL', tone: 'default' },
       { text: '  certs     :: OffSec LLM Red Teaming · PenTest+ · CEH', tone: 'default' },
       { text: '', tone: 'default' },
