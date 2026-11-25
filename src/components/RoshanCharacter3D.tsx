@@ -6,127 +6,6 @@ interface RoshanCharacter3DProps {
   warping: boolean;
 }
 
-function smoothstep(edge0: number, edge1: number, x: number): number {
-  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
-  return t * t * (3 - 2 * t);
-}
-
-/**
- * Computes a distortion-free skin + groomed beard texture directly in 3D unit-sphere
- * coordinates (ux, uy, uz) where +Z is center of face, +Y is top of head, and -Y is chin.
- * Aligned mathematically to eyes (uy≈+0.12), nose tip (uy≈-0.17), and mouth (uy≈-0.42).
- */
-function createFaceSkinBeardTexture(): THREE.CanvasTexture {
-  const w = 1024;
-  const h = 512;
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-
-  if (ctx) {
-    const img = ctx.createImageData(w, h);
-    const data = img.data;
-
-    // Base warm South Asian skin RGB (#bd8158) and groomed dark beard RGB (#18171c)
-    const skinR = 189;
-    const skinG = 129;
-    const skinB = 88;
-    const beardR = 24;
-    const beardG = 22;
-    const beardB = 26;
-
-    for (let py = 0; py < h; py++) {
-      // Three.js CanvasTexture flipY=true: py=0 -> top pole (theta=0, uy=+1), py=h-1 -> chin (uy=-1)
-      const theta = ((py + 0.5) / h) * Math.PI;
-      const sinTheta = Math.sin(theta);
-      const uy = Math.cos(theta);
-
-      for (let px = 0; px < w; px++) {
-        const phi = ((px + 0.5) / w) * Math.PI * 2;
-        const ux = -Math.cos(phi) * sinTheta;
-        const uz = Math.sin(phi) * sinTheta;
-        const ax = Math.abs(ux);
-
-        let beardMask = 0;
-
-        // Only evaluate beard on front/sides of face & under jaw
-        if (uz > -0.28 && uy < 0.16) {
-          // 1. Clean concave cheek line sloping from sideburns down to mouth corners
-          const cheekLineY = -0.38 + 0.52 * Math.pow(ax, 1.55);
-          const belowCheek = 1 - smoothstep(cheekLineY - 0.03, cheekLineY + 0.03, uy);
-
-          // Back boundary along jawline / behind ears (keeps back of neck clean)
-          const backLimitZ = -0.18 + Math.max(0, uy + 0.45) * 0.42;
-          const inFrontOfBackEdge = smoothstep(backLimitZ - 0.04, backLimitZ + 0.04, uz);
-
-          // Bottom neck trim cleanly under the chin
-          const aboveNeckBottom = smoothstep(-0.96, -0.88, uy);
-
-          let jawBeard = belowCheek * inFrontOfBackEdge * aboveNeckBottom;
-
-          // 2. Clean bare-skin cutout around lips & cheeks beside lower lip
-          if (uz > 0.35) {
-            const mouthDist = Math.hypot(ux / 0.255, (uy + 0.46) / 0.125);
-            const mouthCutout = smoothstep(0.86, 1.06, mouthDist);
-            jawBeard *= mouthCutout;
-          }
-
-          // 3. Arched groomed mustache curving down smoothly into jawline corners
-          let mustache = 0;
-          if (uz > 0.5 && ax < 0.31) {
-            const archY = -0.305 - 0.95 * ax * ax;
-            const halfThick = 0.044 * (1 - 0.28 * (ax / 0.31));
-            const distFromArch = Math.abs(uy - archY);
-            const fadeEnds = 1 - smoothstep(0.24, 0.305, ax);
-            mustache = (1 - smoothstep(halfThick - 0.014, halfThick + 0.014, distFromArch)) * fadeEnds;
-          }
-
-          // 4. Neat small tapered soul patch centered right under lower lip
-          let soulPatch = 0;
-          if (uz > 0.55 && uy < -0.47 && uy > -0.64) {
-            const halfW = 0.075 * (1 - (-0.47 - uy) * 2.2);
-            if (halfW > 0.005) {
-              const xIn = 1 - smoothstep(halfW - 0.015, halfW + 0.015, ax);
-              const yTop = 1 - smoothstep(-0.495, -0.47, uy);
-              const yBot = smoothstep(-0.635, -0.59, uy);
-              soulPatch = xIn * yTop * yBot;
-            }
-          }
-
-          beardMask = Math.max(jawBeard, mustache, soulPatch);
-
-          // Subtle natural hair-grain micro-texture inside the beard
-          if (beardMask > 0.05) {
-            const grain = ((Math.sin(px * 12.9898 + py * 78.233) * 43758.5453) % 1 + 1) % 1;
-            beardMask = Math.min(1, beardMask * (0.88 + grain * 0.16));
-          }
-        }
-
-        // Subtle warm facial shading (slightly warmer cheeks/nose)
-        const warmGlow = uz > 0 ? Math.max(0, 1 - Math.hypot(ux * 1.4, uy * 1.4)) * 10 : 0;
-
-        const r = Math.round((skinR + warmGlow) * (1 - beardMask) + beardR * beardMask);
-        const g = Math.round((skinG + warmGlow * 0.6) * (1 - beardMask) + beardG * beardMask);
-        const b = Math.round((skinB + warmGlow * 0.3) * (1 - beardMask) + beardB * beardMask);
-
-        const idx = (py * w + px) * 4;
-        data[idx] = Math.min(255, r);
-        data[idx + 1] = Math.min(255, g);
-        data[idx + 2] = Math.min(255, b);
-        data[idx + 3] = 255;
-      }
-    }
-
-    ctx.putImageData(img, 0, 0);
-  }
-
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.needsUpdate = true;
-  return tex;
-}
-
 export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const warpingRef = useRef(warping);
@@ -230,14 +109,6 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     scene.add(screenUnderGlow);
 
     // ── MATERIALS ──
-    const faceTex = createFaceSkinBeardTexture();
-    faceTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    const headSkinMat = new THREE.MeshStandardMaterial({
-      map: faceTex,
-      roughness: 0.58,
-      metalness: 0.03,
-    });
-
     const skinMat = new THREE.MeshStandardMaterial({
       color: 0xbd8158,
       roughness: 0.56,
@@ -254,6 +125,12 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       color: 0x141418,
       roughness: 0.72,
       metalness: 0.06,
+    });
+
+    const beardMat = new THREE.MeshStandardMaterial({
+      color: 0x18171c,
+      roughness: 0.82,
+      metalness: 0.04,
     });
 
     const scleraMat = new THREE.MeshStandardMaterial({
@@ -485,15 +362,84 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     }
     headGeo.computeVertexNormals();
 
-    const headMesh = new THREE.Mesh(headGeo, headSkinMat);
+    const headMesh = new THREE.Mesh(headGeo, skinMat);
     headMesh.castShadow = true;
     headGroup.add(headMesh);
 
-    // Clean warm lip line centered naturally inside the bare-skin mouth region
-    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.02, 0.125, 8, 12), lipMat);
+    // ── CLEAN 3D GROOMED BEARD (Low cheek line, bare skin around mouth, tidy chin & mustache) ──
+    const beardGroup = new THREE.Group();
+    headGroup.add(beardGroup);
+
+    // Sleek lower-jaw & chin beard shell sitting cleanly below the cheeks and mouth
+    const beardGeo = new THREE.SphereGeometry(
+      0.548,
+      36,
+      24,
+      0,
+      Math.PI * 2,
+      Math.PI * 0.68,
+      Math.PI * 0.32
+    );
+    const bPos = beardGeo.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < bPos.count; i++) {
+      let x = bPos.getX(i);
+      let y = bPos.getY(i);
+      let z = bPos.getZ(i);
+      y *= 1.125;
+      x *= 0.94;
+      z *= 0.985;
+      if (y < 0) {
+        const taper = 1 - Math.abs(y) * 0.23;
+        x *= taper;
+        z *= 1 - Math.abs(y) * 0.09;
+      }
+      // Dip subtly in the front center so bare skin flanks the mouth/soul-patch cleanly
+      if (z > 0.15 && Math.abs(x) < 0.26 && y > -0.42) {
+        y -= 0.035 * (1 - Math.abs(x) / 0.26);
+      }
+      // Trim back cleanly under jawline so it doesn't wrap behind the neck
+      if (z < -0.1) {
+        z = -0.1 + (z + 0.1) * 0.22;
+      }
+      bPos.setXYZ(i, x, y, z);
+    }
+    beardGeo.computeVertexNormals();
+    const beardJaw = new THREE.Mesh(beardGeo, beardMat);
+    beardGroup.add(beardJaw);
+
+    // Tapered sideburn-to-jaw connectors hugging the sides neatly
+    for (const side of [-1, 1]) {
+      const jawStrip = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.28, 10, 14), beardMat);
+      jawStrip.position.set(side * 0.41, -0.15, 0.15);
+      jawStrip.rotation.z = side * 0.32;
+      jawStrip.rotation.x = 0.26;
+      beardGroup.add(jawStrip);
+
+      const sideburn = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.18, 10, 12), beardMat);
+      sideburn.position.set(side * 0.45, 0.04, 0.06);
+      sideburn.rotation.z = side * -0.06;
+      beardGroup.add(sideburn);
+    }
+
+    // Clean curved mustache framing the upper lip
+    for (const side of [-1, 1]) {
+      const stache = new THREE.Mesh(new THREE.CapsuleGeometry(0.026, 0.12, 10, 14), beardMat);
+      stache.position.set(side * 0.08, -0.205, 0.486);
+      stache.rotation.z = Math.PI / 2 - side * 0.26;
+      stache.rotation.y = side * -0.22;
+      beardGroup.add(stache);
+    }
+
+    // Subtle warm lip line & small neat rounded soul patch
+    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.02, 0.13, 8, 12), lipMat);
     mouth.rotation.z = Math.PI / 2;
-    mouth.position.set(0, -0.255, 0.476);
+    mouth.position.set(0, -0.262, 0.48);
     headGroup.add(mouth);
+
+    const soulPatch = new THREE.Mesh(new THREE.SphereGeometry(0.038, 12, 12), beardMat);
+    soulPatch.scale.set(0.9, 1.35, 0.55);
+    soulPatch.position.set(0, -0.335, 0.466);
+    beardGroup.add(soulPatch);
 
     // Ears
     for (const side of [-1, 1]) {
@@ -735,7 +681,6 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('resize', onResize);
       controls.dispose();
-      faceTex.dispose();
       renderer.dispose();
       if (renderer.domElement.parentNode === container) {
         container.removeChild(renderer.domElement);
