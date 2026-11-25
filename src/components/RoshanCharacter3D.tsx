@@ -366,80 +366,57 @@ export default function RoshanCharacter3D({ warping }: RoshanCharacter3DProps) {
     headMesh.castShadow = true;
     headGroup.add(headMesh);
 
-    // ── CLEAN 3D GROOMED BEARD (Single seamless contoured jaw mesh, zero sticking-out patches) ──
+    // ── RAZOR-CLEAN JAWLINE BEARD (Matches reference: clean faded cheeks, sharp diagonal jaw, separate mustache & soul patch) ──
     const beardGroup = new THREE.Group();
     headGroup.add(beardGroup);
 
-    const beardGeo = new THREE.SphereGeometry(
-      0.546,
-      40,
-      28,
-      0,
-      Math.PI * 2,
-      Math.PI * 0.61,
-      Math.PI * 0.39
-    );
-    const bPos = beardGeo.attributes.position as THREE.BufferAttribute;
-    for (let i = 0; i < bPos.count; i++) {
-      let x = bPos.getX(i);
-      let y = bPos.getY(i);
-      let z = bPos.getZ(i);
+    // 1. Sharp diagonal jawline beard strap wrapping cleanly from left jaw angle -> chin -> right jaw angle
+    // (Clean bare faded cheeks & zero hair near/below ears)
+    const jawCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.36, -0.235, 0.05),
+      new THREE.Vector3(-0.33, -0.315, 0.19),
+      new THREE.Vector3(-0.22, -0.395, 0.305),
+      new THREE.Vector3(0, -0.455, 0.355),
+      new THREE.Vector3(0.22, -0.395, 0.305),
+      new THREE.Vector3(0.33, -0.315, 0.19),
+      new THREE.Vector3(0.36, -0.235, 0.05),
+    ]);
+    const jawTubeGeo = new THREE.TubeGeometry(jawCurve, 44, 0.068, 16, false);
+    const jawBeard = new THREE.Mesh(jawTubeGeo, beardMat);
+    beardGroup.add(jawBeard);
 
-      // Match exact headMesh proportions + tiny 1% outward offset so it hugs tightly
-      y *= 1.125;
-      x *= 0.94;
-      z *= 0.98;
-      if (y < 0) {
-        const taper = 1 - Math.abs(y) * 0.24;
-        x *= taper;
-        z *= 1 - Math.abs(y) * 0.1;
-      }
+    // 2. Sculpted neat chin beard contour seamlessly filling the front & underside of the chin
+    const chinContour = new THREE.Mesh(new THREE.SphereGeometry(0.185, 22, 18), beardMat);
+    chinContour.scale.set(1.22, 0.82, 0.85);
+    chinContour.position.set(0, -0.465, 0.255);
+    beardGroup.add(chinContour);
 
-      // Smoothly contour the upper rim: dip cleanly below mouth in front, taper smoothly up near sideburns
-      if (y > -0.34) {
-        const rimFactor = Math.max(0, Math.min(1, (y + 0.34) / 0.18));
-        const ax = Math.abs(x);
-        if (z > 0.18 && ax < 0.26) {
-          // Keep mouth & lip corners cleanly uncovered
-          y -= 0.085 * rimFactor * (1 - ax / 0.26);
-        } else if (z > -0.05 && ax > 0.28) {
-          // Smoothly slope up toward sideburns right in front of the ears
-          y += 0.14 * rimFactor * Math.min(1, (ax - 0.28) / 0.18);
-        }
-      }
+    const underJawFill = new THREE.Mesh(new THREE.SphereGeometry(0.28, 22, 16), beardMat);
+    underJawFill.scale.set(1.18, 0.42, 0.92);
+    underJawFill.position.set(0, -0.48, 0.1);
+    beardGroup.add(underJawFill);
 
-      // Tuck cleanly inside the head behind the jawline/ears so zero hair pokes out back or below ears
-      if (z < -0.06) {
-        const backFade = Math.min(1, (-0.06 - z) / 0.18);
-        const shrink = 1 - backFade * 0.12;
-        x *= shrink;
-        z *= shrink;
-      }
+    // 3. Crisp separate trimmed mustache curving naturally above the upper lip
+    const stacheCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.145, -0.215, 0.448),
+      new THREE.Vector3(-0.07, -0.196, 0.482),
+      new THREE.Vector3(0, -0.194, 0.49),
+      new THREE.Vector3(0.07, -0.196, 0.482),
+      new THREE.Vector3(0.145, -0.215, 0.448),
+    ]);
+    const stacheGeo = new THREE.TubeGeometry(stacheCurve, 24, 0.023, 12, false);
+    const mustache = new THREE.Mesh(stacheGeo, beardMat);
+    beardGroup.add(mustache);
 
-      bPos.setXYZ(i, x, y, z);
-    }
-    beardGeo.computeVertexNormals();
-    const beardJaw = new THREE.Mesh(beardGeo, beardMat);
-    beardGroup.add(beardJaw);
-
-    // Clean curved mustache framing the upper lip
-    for (const side of [-1, 1]) {
-      const stache = new THREE.Mesh(new THREE.CapsuleGeometry(0.026, 0.12, 10, 14), beardMat);
-      stache.position.set(side * 0.08, -0.205, 0.486);
-      stache.rotation.z = Math.PI / 2 - side * 0.26;
-      stache.rotation.y = side * -0.22;
-      beardGroup.add(stache);
-    }
-
-    // Subtle warm lip line & neat small rounded soul patch
-    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.02, 0.13, 8, 12), lipMat);
+    // 4. Clean subtle lips + neat compact soul patch right below lower lip
+    const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.019, 0.125, 8, 12), lipMat);
     mouth.rotation.z = Math.PI / 2;
-    mouth.position.set(0, -0.262, 0.48);
+    mouth.position.set(0, -0.262, 0.464);
     headGroup.add(mouth);
 
-    const soulPatch = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 12), beardMat);
-    soulPatch.scale.set(0.88, 1.3, 0.48);
-    soulPatch.position.set(0, -0.335, 0.464);
+    const soulPatch = new THREE.Mesh(new THREE.SphereGeometry(0.042, 14, 14), beardMat);
+    soulPatch.scale.set(0.85, 1.18, 0.5);
+    soulPatch.position.set(0, -0.33, 0.422);
     beardGroup.add(soulPatch);
 
     // Ears
